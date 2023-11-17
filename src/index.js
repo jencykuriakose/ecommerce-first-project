@@ -2,16 +2,16 @@ const dotenv = require("dotenv");
 dotenv.config({ path: ".env" });
 const express = require("express");
 const morgan = require("morgan");
-const app = express();
 const path = require("path");
-const bodyparser=require("body-parser")
-
+const bodyparser = require("body-parser");
+const connectMongodb = require("./config/mongo.config");
 
 const PORT = process.env.PORT || 5000;
 
-app.use(morgan("dev"))
-app.use(bodyparser.json())
+const app = express();
 
+app.use(morgan("dev"));
+app.use(bodyparser.json());
 
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
@@ -21,6 +21,17 @@ app.use("/", (req, res) => {
 	res.render("home");
 });
 
-app.listen(PORT, () => {
-	console.log(`server is running ${PORT}`);
-});
+
+const start = async () => {
+	await connectMongodb();
+
+	app.listen(PORT, () => {
+		console.log(`server is running ${PORT}`);
+	});
+
+	process.on("uncaughtException", () => {
+		process.exit(1);
+	});
+};
+
+start();
