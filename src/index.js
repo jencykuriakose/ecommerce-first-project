@@ -4,10 +4,14 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const path = require("path");
+const bodyparser=require("body-parser")
+
 
 const PORT = process.env.PORT || 5000;
 
 app.use(morgan("dev"))
+app.use(bodyparser.json())
+
 
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
