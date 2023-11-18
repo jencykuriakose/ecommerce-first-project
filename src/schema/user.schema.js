@@ -15,11 +15,11 @@ const userSchema = new mongoose.Schema({
 	},
 	phone: {
 		type: Number,
-		required: true
+		required: true,
+		unique:true
 	},
 	profileimage: {
-		type: String,
-		required: true
+		type: String
 	},
 	address: {
 		type: mongoose.Schema.Types.ObjectId,
