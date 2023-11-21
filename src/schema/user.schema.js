@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
 	username: {
@@ -9,6 +10,10 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	isadmin: {
+		type: Boolean,
+		default: false
+	},
 	password: {
 		type: String,
 		required: true
@@ -16,7 +21,7 @@ const userSchema = new mongoose.Schema({
 	phone: {
 		type: Number,
 		required: true,
-		unique:true
+		unique: true
 	},
 	profileimage: {
 		type: String
@@ -26,5 +31,16 @@ const userSchema = new mongoose.Schema({
 		ref: "address"
 	}
 });
+
+userSchema.pre("save", async function () {
+	if (!this.isModified("password")) return;
+	const genSalt = await bcrypt.genSalt(10);
+	this.password = await bcrypt.hash(this.password, genSalt);
+});
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+	const isMatch = await bcrypt.compare(candidatePassword, this.password);
+	return isMatch;
+};
 
 module.exports = mongoose.model("user", userSchema);
