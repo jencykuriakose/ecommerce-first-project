@@ -134,7 +134,7 @@
             dangerMode: true,
         }).then(async (willDelete) => {
             if (willDelete) {
-                try {
+                
                     const response = await fetch('/admin/category-status', {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
@@ -175,12 +175,8 @@
                     } else {
                         callAlertify('warning', `Category disabled successfully`);
                     }
-                } catch (error) {
-                    callAlertify('error', error.message);
-                }
+                } 
             }
-        });
-    }
-
-
+        );
+        }
 </script>

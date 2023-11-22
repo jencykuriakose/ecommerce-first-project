@@ -14,16 +14,16 @@
         <header class="card-header">
             <div class="row align-items-center">
 
-                <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                 <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
                     <select class="form-select">
                         <option hidden selected>ALL CATEGORIES</option>
-                        <% categories.forEach(category=> { %>
+                        <% Categories.forEach(category=> { %>
                             <% if(category.active) { %>
                                 <option value="<%= category._id %>">
                                     <%= category.name %>
                                 </option>
                                 <% } %>
-                                    <% }); %>
+                                    <% }); %> 
                     </select>
                 </div>
                 <!-- <div class="col-md-2 col-6">

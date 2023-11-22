@@ -1,5 +1,5 @@
 const utils = require("./utils");
-
+const productModel = require("../models/product.model")
 const UserModel = require("../models/userAuth.model");
 
 const userModel = new UserModel();
@@ -9,7 +9,7 @@ const getadminhome = async (req, res) => {
 };
 
 const getadminlogin = async (req, res) => {
-	res.render("admin/dashboard");
+	res.render("admin/login");
 };
 
 const getuserlist = async (req, res) => {
@@ -31,7 +31,7 @@ const getuserlist = async (req, res) => {
 };
 
 const PostLogin = async (req, res) => {
-	console.log("🤣");
+	//console.log("🤣");
 
 	if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
 		if (req.body.email === process.env.ADMIN_EMAIL && req.body.password === process.env.ADMIN_PASSWORD) {
@@ -45,9 +45,15 @@ const PostLogin = async (req, res) => {
 	}
 };
 
+const getproducts = async (req, res) => {
+    const product = productModel.()	
+	res.render("admin/products",{});
+ };
+
 module.exports = {
 	getadminhome,
 	getadminlogin,
 	PostLogin,
-	getuserlist
+	getuserlist,
+    getproducts,
 };

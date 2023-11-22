@@ -20,8 +20,7 @@ class UserModel {
 
 	async fetchAllUsers(page, limit) {
 		try {
-			const users = await UserDatabase
-				.find({})
+			const users = await UserDatabase.find({})
 				.skip((page - 1) * limit)
 				.limit(limit);
 
