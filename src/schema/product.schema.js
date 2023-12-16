@@ -2,10 +2,9 @@ const mongoose = require("mongoose");
 
 const ProductSchema = new mongoose.Schema(
 	{
-		productname: {
+		productName: {
 			type: String,
-			required: true,
-			unique: true
+			required: true
 		},
 
 		productDescription: {
@@ -14,19 +13,19 @@ const ProductSchema = new mongoose.Schema(
 		},
 
 		productCategory: {
-			type: mongoose.Schema.Types.Objectid,
-			ref: "category",
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Category",
 			required: true
 		},
 
-		productprice: {
+		productPrice: {
 			type: Number,
 			required: true
 		},
 
 		productoldprice: {
 			type: Number,
-			default: null
+			default: true
 		},
 
 		stocks: {
@@ -34,37 +33,33 @@ const ProductSchema = new mongoose.Schema(
 			required: true
 		},
 
-		prodcutimageurl: [
+		productimageurl: [
 			{
 				type: String
 			}
 		],
 
-		productstatus: {
+		deleteStatus: {
 			type: Boolean,
-			default: true
+			default: false
 		},
 
 		productnumber: {
 			type: Number
 		},
+		productstatus: {
+			type: Boolean,
+			default: true
+		},
 
-		slug: {
-			type: String
-		}
+		// slug: {
+		// 	type: String
+		// }
 	},
 
 	{ timestamps: true }
 );
 
-// const autoincrementplugin=(schema,Options)=>{
-//     const {field="productnumber",startAt=1}=options;
 
-//     schema.pre("save",async function(next){
-//         if(!this[field]){
-//             const lastorder=await this.constructor.findone
-//         }
-//     })
-// }
 
-module.exports = mongoose.model("product", ProductSchema);
+module.exports = mongoose.model("Product", ProductSchema);

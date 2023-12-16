@@ -33,13 +33,14 @@ submitButton.addEventListener('click', (event) => {
     callAlertify('warning', 'Please fill in all required fields');
     setTimeout(() => {
       submitButton.disabled = false;
-    }, 3000);
+    }, 1000);
     return;
   }
 
   const url = '/admin/add-products';
   submitButton.disabled = true;
 
+  
 
   axios
     .post(url, formData, {

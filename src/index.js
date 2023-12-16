@@ -1,3 +1,4 @@
+const {cartProducts, loggedInMiddleware} = require('./middleware/custom.middleware')
 const dotenv = require("dotenv");
 dotenv.config({ path: ".env" });
 require("express-async-errors");
@@ -12,6 +13,7 @@ const userRoute = require("./routes/user.route");
 const adminRoute = require("./routes/admin.route");
 const handleError = require("./middleware/error-handler.middleware");
 
+
 const PORT = process.env.PORT || 5000;
 
 const app = express();
@@ -21,6 +23,7 @@ app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieparser());
+
 app.use(
 	session({
 		secret: process.env.SESSION_SECRET,
@@ -32,13 +35,20 @@ app.use(
 	})
 );
 
+// view engine setup
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+
+// custom middleware
+
+app.use(cartProducts);
+app.use(loggedInMiddleware);
 
 app.use("/", userRoute);
 app.use("/admin", adminRoute);
 
-app.use(handleError);
+// app.use({handleError});
 
 const start = async () => {
 	await connectMongodb();

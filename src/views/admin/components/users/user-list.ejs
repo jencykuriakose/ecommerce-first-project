@@ -22,7 +22,7 @@
                                 <td width="40%">
                                     <a href="#" class="itemside">
                                         <div class="left">
-                                            <img src="<%= user.profileimage %>" class="img-sm img-avatar" alt="Userpic">
+                                            <img src="<%= user.profileimage?user.profileimage :'/admins/assets/imgs/people/avatar1.jpg' %>" class="img-sm img-avatar" alt="Userpic">
                                         </div>
                                         <div class="info pl-3">
                                             <h6 id="username" class="mb-0 title">

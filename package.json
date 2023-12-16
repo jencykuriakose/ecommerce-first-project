@@ -11,8 +11,10 @@
 	"author": "jency kuriakose",
 	"license": "ISC",
 	"dependencies": {
+		"@hapi/hoek": "^11.0.2",
 		"bcrypt": "^5.1.1",
 		"body-parser": "^1.20.2",
+		"cloudinary": "^1.41.0",
 		"cookie-parser": "^1.4.6",
 		"dotenv": "^16.3.1",
 		"ejs": "^3.1.9",
@@ -21,7 +23,10 @@
 		"express-session": "^1.17.3",
 		"joi": "^17.11.0",
 		"mongoose": "^8.0.1",
-		"twilio": "^4.19.0"
+		"multer": "^1.4.5-lts.1",
+		"nodemailer": "^6.9.7",
+		"twilio": "^4.19.0",
+		"uuidv4": "^6.2.13"
 	},
 	"devDependencies": {
 		"morgan": "^1.10.0",

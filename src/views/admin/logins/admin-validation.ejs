@@ -1,4 +1,4 @@
-<script>
+  <script>
     const form = document.getElementById("login-form");
     const email = document.getElementById("email");
     const passwordInput = document.getElementById("password");
@@ -11,11 +11,11 @@
     email.addEventListener("input", () => {
         let emailError = "";
 
-        if (email.value.trim() === "") {
-            emailError = "<strong>Email is required.</strong>";
-        } else if (!emailRegex.test(email.value)) {
-            emailError = "<strong>Invalid email format.</strong>";
-        }
+        // if (email.value.trim() === "") {
+        //     emailError = "<strong>Email is required.</strong>";
+        // } else if (!emailRegex.test(email.value)) {
+        //     emailError = "<strong>Invalid email format.</strong>";
+        // }
 
         document.getElementById('email-error').innerHTML = '';
         emailErrorElement.innerHTML = emailError;
@@ -26,11 +26,11 @@
     passwordInput.addEventListener("input", () => {
         let passwordError = "";
 
-        if (passwordInput.value.trim() === "") {
-            passwordError = "<strong>Password is required.</strong>";
-        } else if (!passwordRegex.test(passwordInput.value.trim())) {
-            passwordError = "<strong>Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number.</strong>";
-        }
+        // if (passwordInput.value.trim() === "") {
+        //     passwordError = "<strong>Password is required.</strong>";
+        // } else if (!passwordRegex.test(passwordInput.value.trim())) {
+        //     passwordError = "<strong>Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number.</strong>";
+        // }
 
         document.getElementById('password-error').innerHTML = '';
         passwordErrorElement.innerHTML = passwordError;
@@ -53,20 +53,20 @@
             isValid = false;
         }
 
-        if (passwordInput.value.trim() === "") {
-            passwordError = "<strong>Password is required.</strong>";
-            isValid = false;
-        } else if (!passwordRegex.test(passwordInput.value.trim())) {
-            passwordError = "<strong>Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number.</strong>";
-            isValid = false;
-        }
+        // if (passwordInput.value.trim() === "") {
+        //     passwordError = "<strong>Password is required.</strong>";
+        //     isValid = false;
+        // } else if (!passwordRegex.test(passwordInput.value.trim())) {
+        //     passwordError = "<strong>Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number.</strong>";
+        //     isValid = false;
+        // }
 
         emailErrorElement.innerHTML = emailError;
         passwordErrorElement.innerHTML = passwordError;
         email.classList.toggle("is-invalid", emailError !== "");
         passwordInput.classList.toggle("is-invalid", passwordError !== "");
 
-          try {
+          try { 
             $.ajax({
                  type: 'post',
                 url: "login",
@@ -88,9 +88,9 @@
                  }
 
             })
-         } catch (error) {
+          } catch (error) { 
               console.error(error);
-         }
-     });
+         } 
+      }); 
  </script>
     

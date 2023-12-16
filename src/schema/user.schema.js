@@ -18,13 +18,19 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	status: {
+		type: Boolean,
+		required: true,
+		default: true
+	},
 	phone: {
 		type: Number,
 		required: true,
 		unique: true
 	},
 	profileimage: {
-		type: String
+		type: String,
+		default:'https://res.cloudinary.com/db75pwvct/image/upload/v1702651740/wosofy/profile_images/xp2hgpwlpq2vvnfquywj.jpg'
 	},
 	address: {
 		type: mongoose.Schema.Types.ObjectId,

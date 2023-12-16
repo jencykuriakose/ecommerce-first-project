@@ -1,29 +1,39 @@
 const joi = require("joi");
 
-const addproductSchema = joi.object({
-	productname: joi.string().trim().min(3).max(100).required().message({
-		"string.base": "product must be an string",
-		"string.empty": "product title is required",
-		"string.min": "product title must be 3 character long",
-		"string.max": "product title cannot exceed 100 characters"
-	}),
+const signupvalidationSchema = joi.object({
+	username: joi.string().required(),
+	email: joi.string().email().required(),
+	phone: joi.string().length(10).required(),
+	password: joi.string().required(),
+	confirmpassword: joi.string().required(),
+	otp: joi.string().required(),
+	checkbox: joi.optional()
+});
 
-	productdescription: joi.string().trim().min(6).max(300).required().message({
+//add-product
+
+const addProductSchema = joi.object({
+	productName: joi.string().trim().min(2).max(100).required().messages({
+		"string.base": "Product title must be a string",
+		"string.empty": "Product title is required",
+		"string.min": "Product title must be at least 2 characters long",
+		"string.max": "Product title cannot exceed 100 characters"
+	}),
+	productDescription: joi.string().trim().min(5).max(600).required().messages({
 		"string.base": "description must be a string",
 		"string.empty": "description is required",
-		"string.min": "description must be 6 character long",
-		"string:max": "description cannot exceed 300 characters"
+		"string.min": "description must be at least 5 characters long",
+		"string.max": "description cannot exceed 600 characters"
 	}),
-	productprice: joi.number().positive().required().message({
-		"number.base": "regular price must be a number",
-		"number.positive": "regular price must be a positive number",
-		"any.required": "regular price is required"
+	productPrice: joi.number().positive().required().messages({
+		"number.base": "Regular price must be a number",
+		"number.positive": "Regular price must be a positive number",
+		"any.required": "Regular price is required"
 	}),
-
-	productoldprice: joi.number().positive().required().message({
-		"number.base": "old price must be a number",
-		"number.positive": "old price must be a positive number",
-		"any.required": "old price is required "
+	productOldPrice: joi.number().positive().required().messages({
+		"number.base": "Old price must be a number",
+		"number.positive": "Old price must be a positive number",
+		"any.required": "Old price is required"
 	}),
 	stocks: joi.number().integer().positive().required().messages({
 		"number.base": "Stocks must be a number",
@@ -31,7 +41,7 @@ const addproductSchema = joi.object({
 		"number.positive": "Stocks must be a positive number",
 		"any.required": "Stocks is required"
 	}),
-	productcategory: joi.string().required().messages({
+	productCategory: joi.string().required().messages({
 		"any.required": "Category is required"
 	}),
 	productImage: joi.array().required().messages({
@@ -39,49 +49,81 @@ const addproductSchema = joi.object({
 	})
 });
 
-const updateproductSchema = joi
-	.object({
-		productname: joi.string().trim().min(3).max(100).required().message({
-			"string.base": "product must be an string",
-			"string.empty": "product title is required",
-			"string.min": "product title must be 3 character long",
-			"string.max": "product title cannot exceed 100 characters"
-		}),
+//update product
 
-		productdescription: joi.string().trim().min(6).max(300).required().message({
-			"string.base": "description must be a string",
-			"string.empty": "description is required",
-			"string.min": "description must be 6 character long",
-			"string:max": "description cannot exceed 300 characters"
-		}),
-		productprice: joi.number().positive().required().message({
-			"number.base": "regular price must be a number",
-			"number.positive": "regular price must be a positive number",
-			"any.required": "regular price is required"
-		}),
+const updateproductschema = joi.object({
+	productName: joi.string().trim().min(2).max(100).messages({
+		"string.base": "product title must be string",
+		"string.empty": "product title is required",
+		"string.min": "product title must 2 characters long",
+		"string.max": "product title cannot exceed 100 characters"
+	}),
+	productDescription: joi.string().trim().min(5).max(200).messages({
+		"string.base": "product title must be string",
+		"string.empty": "product title is required",
+		"string.min": "product title must 5 characters long",
+		"string.max": "product title cannot exceed 200 characters"
+	}),
+	productPrice: joi.number().positive().messages({
+		"number.base": "regular price be a number",
+		"number.positive": "regular price must be positive"
+	}),
+	productOldPrice: joi.number().positive().messages({
+		"number.base": "old price be a number",
+		"number.positive": "old price must be positive"
+	}),
 
-		productoldprice: joi.number().positive().required().message({
-			"number.base": "old price must be a number",
-			"number.positive": "old price must be a positive number",
-			"any.required": "old price is required "
-		}),
-		stocks: joi.number().integer().positive().required().messages({
-			"number.base": "Stocks must be a number",
-			"number.integer": "Stocks must be an integer",
-			"number.positive": "Stocks must be a positive number",
-			"any.required": "Stocks is required"
-		}),
-		productCategory: joi.string().required().messages({
-			"any.required": "Category is required"
-		}),
-		productImage: joi.array().required().messages({
-			"any.required": "Product image is required"
-		}),
-		productid: joi.any().optional()
-	})
-	.min(1);
+	stocks: joi.number().integer().min(0).messages({
+		"number.base": "stock must be a number",
+		"number.integer": "stock must be a integer",
+		"number.min": "stock cannot be negative"
+	}),
+	productCategory: joi.string().required().messages({
+		"any.required": "category is required"
+	}),
+
+	productimage: joi.array().messages({
+		"any.required": "product image is required"
+	}),
+	productId:joi.string().required()
+}).min(1);
+
+//address
+const addressSchema = joi.object({
+	fname: joi
+		.string()
+		.trim()
+		.pattern(/^[A-Za-z]+(?:[\s-][A-Za-z]+)*$/)
+		.required(),
+	lname: joi
+		.string()
+		.trim()
+		.pattern(/^[A-Za-z]+(?:[\s-][A-Za-z]+)*$/)
+		.required(),
+	country: joi.string().trim().required(),
+	street_address: joi.string().trim().required(),
+	city: joi.string().trim().required(),
+	state: joi.string().trim().required(),
+	zipcode: joi.string().trim().pattern(/^\d+$/).required(),
+	phone: joi.string().trim().optional(),
+	email: joi.string().trim().email().optional()
+});
+
+// update the userr data
+
+const updateUserSchema = joi.object({
+	profileimage: joi.any().optional(),
+	name: joi.string().trim().min(2).max(100).optional(),
+	email: joi.string().trim().email().optional(),
+	password: joi.string().trim().min(6).max(30).optional(),
+	npassword: joi.string().trim().min(6).max(30).allow("").optional(),
+	cpassword: joi.any().valid(joi.ref("npassword")).allow("").optional()
+});
 
 module.exports = {
-	addproductSchema,
-	updateproductSchema
+	signupvalidationSchema,
+	addProductSchema,
+	updateproductschema,
+	updateUserSchema,
+	addressSchema
 };
