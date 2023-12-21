@@ -35,7 +35,6 @@ adminRouter.route("/edit-product/:productId").get(IsAdminLoggedIn, productContro
 IsAdminLoggedIn,
 productController.PutEditProduct);
 
-
 adminRouter.route("/product-status/:id").put(IsAdminLoggedIn,productController.deleteproduct);
 
 adminRouter.route('/orders').get(ordercontroller.getorderpage);
