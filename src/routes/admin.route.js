@@ -57,5 +57,4 @@ adminRouter.route("/graph").get(IsAdminLoggedIn,adminController.getGraphData);
 // adminRouter.route("/chart").get(IsAdminLoggedIn,adminController.getChartData);
 
 
-
 module.exports = adminRouter;
