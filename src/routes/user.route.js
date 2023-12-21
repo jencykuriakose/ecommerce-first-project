@@ -42,6 +42,7 @@ userRouter.route("/account").get(IsLoggedIn,userController.getaccount);
 
 // userRouter.route('/update-userdata',(req,res,next)=>{console.log(req.file);},'/update-userdata',upload.single('profileimage')),userController.updateuserdata);
 // userRouter.route('/update-userdata').post(upload.single('profileimage'),userController.updateuserdata)
+
 userRouter.route('/update-userdata').post(upload.single('profileimage'), userController.updateuserdata);
 
 userRouter.route("/product/:productId").get(productController.LoadProductDetails);

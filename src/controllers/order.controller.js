@@ -46,38 +46,19 @@ const GetCheckOut = async (req, res) => {
 			}
 		});
 		const result = await ordermodel.getAddress(req.session.user._id, res);
-		// const userWallet = await getUserData(req.session.user._id);
+	
 		if (cartResult.status) {
 			if (result.status) {
-				// let discountAmount;
-				// let couponcode;
-				// if (req.session.coupon) {
-				//   const coupon = req.session.coupon;
-				//   couponcode = coupon.code;
-				//   discountAmount = (coupon.discount / 100) * cartResult.cart.total;
-				// } else {
-				//   discountAmount = 0;
-				//   couponcode = null;
-				// }
-
-				// let appliedWallet;
-				// if(req.session.appliedWallet){
-				//   appliedWallet = req.session.appliedWallet
-				// }
+				
 
 				return res.render("user/checkout", {
 					addresses: result.addresses
-					//   walletAmount: userWallet.amount,
-					//   coupons: coupons,
-					//   couponDiscount: discountAmount,
-					//   couponcode: couponcode,
-					//   appliedWallet:appliedWallet
+					
 				});
 			} else {
 				return res.render("user/checkout", {
 					addresses: []
-					//   walletAmount: userWallet.amount,
-					//   coupons: [],
+					
 				});
 			}
 		} else {
@@ -92,15 +73,7 @@ const PostCheckOut = async (req, res) => {
 
 	let cartTotal = checkoutResult.cartResult.total;
 
-	// if(req.session.coupon){
-	//   let coupon = req.session.coupon;
-	//   const discountAmount = (coupon.discount / 100) * cartTotal;
-	//   cartTotal = cartTotal - discountAmount;
-	// }
-
-	// if(req.session.appliedWallet){
-	//   cartTotal = cartTotal - req.session.appliedWallet;
-	// }
+	
 
 	if (cartTotal < 1) {
 		await orderStatus(checkoutResult.order._id);
@@ -120,19 +93,15 @@ const PostCheckOut = async (req, res) => {
 				message: "order details added!",
 				orderId: checkoutResult.order._id
 			});
-			//   } else if (paymentmethod === 'razorpay') {
-			//     const razorPayOrder = await generateRazorpay(checkoutResult.order);
-			//     return res.json({
-			//       success: true,
-			//   paymethod: 'ONLINE',
-			//   message: 'order details added!',
-			//   order: razorPayOrder,
-			// });
+			
 		}
 	} else {
 		return res.json({ success: false, message: "something goes wrong" });
 	}
 };
+
+
+
 
 const AddAddress = async (req, res) => {
 	const addressresult = await ordermodel.AddAddress(req.body, req.session.user._id, res);
@@ -194,6 +163,18 @@ res.json({ message: 'order canceled successfully', success: true });
 }
 
 
+const changeOrderStatus=async (req,res)=>{
+	const {id}=req.body;
+	const { orderId,status }=id;
+	const result =await ordermodel.changeOrderStatus(status,orderId);
+	if(result.status){
+		return res.json({ success: true, message: result.message });
+    } else {
+      return res.json({ success: false, message: result.message });
+    }
+	}
+
+
 
 
 
@@ -210,6 +191,6 @@ module.exports = {
 	SuccessPage,
 	getOrderDetails,
 	DeleteAddress,
-	CancelOrder
+	CancelOrder,changeOrderStatus
 	
 }

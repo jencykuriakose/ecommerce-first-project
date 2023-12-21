@@ -73,14 +73,14 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Discount</th>
-                                                        <td class="product-subtotal" colspan="2">₹<%=
-                                                            //   Math.floor((orderData?.discount|| 0))  %>
+                                                        <td class="product-subtotal" colspan="2">₹
+                                                          
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <th>Wallet</th>
-                                                        <td class="product-subtotal" colspan="2">₹<%=
-                                                            //   Math.floor((orderData?.wallet|| 0))  %>
+                                                        <td class="product-subtotal" colspan="2">₹
+                                                         
                                                         </td>
                                                     </tr>
 
@@ -200,6 +200,50 @@
                             </div>
                         </div>
                     </div>
+
+
+
+
+ <!-- pagination  -->
+
+                <!-- </div> card end// -->
+                <div class="pagination-area mt-15 mb-50">
+                  <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                      <% if(currentPage> 1) { %>
+                        <li class="page-item"><a class="page-link"
+                            href="/user/orders?page=<%=currentPage-1%>&limit=<%=limit%>"><i
+                              class="material-icons md-chevron_left"></i></a></li>
+                        <% } %>
+                          <% for (let i=1; i<=totalPages; i++) { %>
+                            <% if (i===currentPage) { %>
+                              <li class="page-item active"><a class="page-link" href="#">
+                                  <%= i %>
+                                </a></li>
+                              <% } else { %>
+                                <li class="page-item"><a class="page-link"
+                                    href="/user/orders?page=<%=i%>&limit=<%=limit%>">
+                                    <%= i %>
+                                  </a></li>
+                                <% } %>
+                                  <% } %>
+                                    <% if (currentPage < totalPages) { %>
+                                      <li class="page-item"><a class="page-link"
+                                          href="/user/orders?page=<%=currentPage+1%>&limit=<%=limit%>"><i
+                                            class="material-icons md-chevron_right"></i></a></li>
+                                      <% } %>
+                    </ul>
+                  </nav>
+                </div>
+
+
+
+
+
+
+
+
+
             </section>
         </main>
 

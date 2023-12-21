@@ -52,11 +52,10 @@
                                                 <div class="tab-content dashboard-content">
                                                     <%- include('./components/account/dashboardDetails.ejs') %>
                                                         <!-- <- include('./components/account/orderlist.ejs') %> -->
+
                                                         <%- include('./components/account/orderList.ejs', { order: order }) %>
-                                                        
+                                                    
 
-
-                                                            <!-- <- include('./components/account/trackOrder.ejs') %> -->
                                                                 <%- include('./components/account/billingAddress.ejs') %>
                                                                    
                                                                     <%- include('./components/account/accountDetails.ejs')%>

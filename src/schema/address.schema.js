@@ -40,6 +40,14 @@ const addressSchema = new mongoose.Schema({
 	user: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user"
-	}
+	},
+	isShippingAddress: {
+		type: Boolean,
+		default: false,
+	  },
+	  isBillingAddress: {
+		type: Boolean,
+		default: false,
+	  },
 });
 module.exports = mongoose.model("address", addressSchema);

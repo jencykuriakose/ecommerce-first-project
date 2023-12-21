@@ -7,6 +7,7 @@ const { signupvalidationSchema, updateUserSchema } = require("../config/joi");
 const { json } = require("body-parser");
 const bcrypt=require("bcrypt");
 const uuidv4=require('uuidv4');
+const { getOrderDetails } = require("./order.controller");
 const userModel = new UserModel();
 
 const categoryModel = new CategoryModel();
@@ -117,9 +118,10 @@ const getaccount = async (req, res) => {
 		return res.render("user/account", {
 			userData: userData,
 			 order: order.orderDetails,
-			 address: order.addressDetails,
-			 totalpage: order.totalpage,
-			 currentpage: order.currentpage,
+			 address: order.addresses,
+			//  addressDetails,
+			 totalpage: order.totalPages,
+			 currentpage: order.currentPage,
 			 limit: order.limit
 		});
 	}
@@ -165,24 +167,6 @@ const forgotPass = async (req,res) =>{
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const updateuserdata = async (req, res) => {
 	const { error, value } =  updateUserSchema.validate(req.body);
 	console.log(req.body,req.file)
@@ -205,6 +189,17 @@ const getlogout = (req, res) => {
 	res.redirect("/");
 };
 
+
+const getInvoice=async ( req , res )=>{
+	const id=req.query.id;
+	const invoicedata= await ordermodel.getOrderDetails(id);
+	generateInvoice(invoicedata,res);
+
+};
+
+
+
+
 module.exports = {
 	getSignup,
 	getHome,
@@ -219,5 +214,6 @@ module.exports = {
 	//  LoadProductDetails,
 	updateuserdata,
 	getlogout,
-	GenerateUniquePassword
+	GenerateUniquePassword,
+	getInvoice
 };

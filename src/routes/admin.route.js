@@ -12,6 +12,8 @@ const ordercontroller=require("../controllers/order.controller");
 
 const upload = require("../config/multer");
 
+adminRouter.route("/")
+
 adminRouter.route("/login").get(adminController.getadminlogin).post(adminController.PostLogin);
 
 adminRouter.route("/users").get(IsAdminLoggedIn, adminController.getuserlist);
@@ -38,6 +40,8 @@ adminRouter.route("/product-status/:id").put(IsAdminLoggedIn,productController.d
 
 adminRouter.route('/orders').get(ordercontroller.getorderpage);
 
+adminRouter.route('/order-status').post(IsAdminLoggedIn,ordercontroller.changeOrderStatus);
+
 adminRouter.route('/order-details').get(IsAdminLoggedIn,ordercontroller.getOrderDetails);
 
 adminRouter.route("/user-status").put(IsAdminLoggedIn, adminController.PutBlockUser);
@@ -45,5 +49,13 @@ adminRouter.route("/user-status").put(IsAdminLoggedIn, adminController.PutBlockU
 adminRouter.route("/categories").get(IsAdminLoggedIn, adminController.GetCategories).post(IsAdminLoggedIn, adminController.postCategories);
 
 adminRouter.route("/category-status").put(IsAdminLoggedIn, adminController.putCategory);
+
+adminRouter.route("/sales-report").get(IsAdminLoggedIn,adminController.getReport);
+
+adminRouter.route("/graph").get(IsAdminLoggedIn,adminController.getGraphData);
+
+// adminRouter.route("/chart").get(IsAdminLoggedIn,adminController.getChartData);
+
+
 
 module.exports = adminRouter;

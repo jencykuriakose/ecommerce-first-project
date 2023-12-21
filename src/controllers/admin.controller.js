@@ -2,15 +2,31 @@ const utils = require("./utils");
 const ProductModel = require("../models/product.model");
 const UserModel = require("../models/userAuth.model");
 const CategoryModel = require("../models/category.model");
+const adminModel=require("../models/admin.model");
+const orderModel=require("../models/order.model");
+
 // const { get } = require("mongoose");
+const {generateSalesReport} =require("../config/pdfKit");
+//  const orderModel = require("../models/order.model");
 
 const userModel = new UserModel();
 const productModel = new ProductModel();
 const categoryModel = new CategoryModel();
+//  const ordermodel=new orderModel();
+const adminmodel=new adminModel();
+ const ordermodel=new orderModel();
 
 const getadminhome = async (req, res) => {
-	res.render("admin/dashboard");
-};
+	const result=await adminmodel.getDashboardData();
+	res.render("admin/dashboard",{
+	totalRevenue: result.totalRevenue,
+      totalOrdersCount: result.totalOrdersCount,
+      totalProductsCount: result.totalProductsCount,
+      totalCategoriesCount: result.totalCategoriesCount,
+      currentMonthEarnings: result.currentMonthEarnings,
+      activePage:'dashboard'
+});
+}
 
 const getadminlogin = async (req, res) => {
 	res.render("admin/login");
@@ -91,6 +107,36 @@ const AddProducts = async (req, res) => {
 	res.render("admin/add-products");
 };
 
+
+
+const getReport=async(req,res)=>{
+const reportData=await ordermodel.getorderData();
+generateSalesReport(reportData,res);
+}
+
+
+const getGraphData=async (req,res)=>{
+	try {
+		const result = await adminmodel.graphData();
+		if (result.status) {
+		  res.json({
+			labels: result.labels,
+			sales: result.salesData,
+			products: result.productsData,
+			message: result.message,
+			success: true,
+		  });
+		} else {
+		  res.json({ success: false, message: result.message });
+		}
+	  } catch (error) {
+		console.error('Error fetching chart data:', error);
+		res.status(500).json({ success: false, message: 'Internal server error' });
+	  }
+}
+	
+
+
 module.exports = {
 	getadminhome,
 	getadminlogin,
@@ -100,5 +146,8 @@ module.exports = {
 	GetCategories,
 	postCategories,
 	putCategory,
-	AddProducts
+	AddProducts,
+	getReport,
+	getGraphData,
+	
 };

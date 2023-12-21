@@ -13,9 +13,10 @@
 
         if (email.value.trim() === "") {
             emailError = "<strong>Email is required.</strong>";
-        } else if (!emailRegex.test(email.value)) {
-            emailError = "<strong>Invalid email format.</strong>";
-        }
+        } 
+        // else if (!emailRegex.test(email.value)) {
+        //     emailError = "<strong>Invalid email format.</strong>";
+        // }
 
         document.getElementById('emailError').innerHTML = '';
         emailErrorElement.innerHTML = emailError;
@@ -28,9 +29,10 @@
 
         if (passwordInput.value.trim() === "") {
             passwordError = "<strong>Password is required.</strong>";
-        } else if (!passwordRegex.test(passwordInput.value.trim())) {
-            passwordError = "<strong>Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number.</strong>";
-        }
+        } 
+        // else if (!passwordRegex.test(passwordInput.value.trim())) {
+        //     passwordError = "<strong>Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number.</strong>";
+        // }
 
         document.getElementById('passwordError').innerHTML = '';
         passwordErrorElement.innerHTML = passwordError;

@@ -34,7 +34,7 @@
                         Enter the OTP sent to
                         <span class="font-semibold">+91 <%= phone %></span>
                       </div>
-                      <form  id="otp-form">
+                      <!-- <form  id="otp-form">
                         <div class="form-group">
                           <input id="otp" name="otp" class="form-control" placeholder="Enter OTP" type="text">
                           <div id="otp-error" class="invalid-feedback"></div>
@@ -42,10 +42,54 @@
                         <div class="form-group">
                           <button type="submit" class="btn btn-fill-out btn-block w-100 hover-up" name="verify"
                             id="verify-button">VERIFY OTP</button>
-                            <p id="timer">Time remaining: <span id="countdown">60</span> seconds</p>
+                            <!-- <p id="timer">Time remaining: <span id="countdown">60</span> seconds</p> -->
+<!-- Inside the form -->
+<!-- <span id="timerdiv" style="display: none;"> Resend OTP in: <span id="timer"></span></span> -->
+<!-- <p id="resend-btn" style="display: none;">Didn't receive an OTP? <button type="button" class="resbtn" id="resend-btn" onclick="resendOTP()">Resend</button></p> -->
+
+
+
+                         <!-- </div> -->
+                         <!-- <div class="text-muted text-center mt-4"><a href="#">Resend OTP</a><span id="timer"></span></span></div>
+                        <span id="timerdiv" style="display: none;"> Resend OTP in: <span id="timer"></span></span>
+<p id="resend-btn" style="display: none;">Didn't receive an OTP? <button type="button" class="resbtn" id="resend-btn" onclick="resendOTP()">Resend</button></p> -->
+<!-- Inside the form
+<div class="text-muted text-center mt-4">
+   <!-- <a href="#" onclick="resendOTP()">Resend OTP</a>  -->
+  <!-- <span id="timerdiv" style="display: none;"> Resend OTP in: <span id="timer"></span></span> -->
+<!-- </div> -->
+ <!-- <p id="resend-btn" style="display: none;">Didn't receive an OTP? <button type="button" class="resbtn" onclick="resendOTP()">Resend</button></p> -->
+
+
+                      <!-- </form> --> 
+
+                      <form id="otp-form">
+                        <div class="form-group">
+                          <input id="otp" name="otp" class="form-control" placeholder="Enter OTP" type="text">
+                          <div id="otp-error" class="invalid-feedback"></div>
                         </div>
-                        <div class="text-muted text-center mt-4"><a href="#">Resend OTP</a></div>
+                        <div class="form-group">
+                          <button type="submit" class="btn btn-fill-out btn-block w-100 hover-up" name="verify" id="verify-button">VERIFY OTP</button>
+                          <span id="timerdiv" style="display: none;"> Resend OTP in: <span id="timer"></span></span>
+                          <!-- <p id="resend-btn" style="display: none;">Didn't receive an OTP? < type="text" class="resbtn" onclick="resendOTP()">Resend OTP</p> -->
+                          <p id="resend-btn" style="display: none;">Didn't receive an OTP? <span class="resbtn" onclick="resendOTP()">Resend OTP</span></p>
+
+                        </div>
                       </form>
+                      
+
+
+
+
+
+
+
+
+
+
+
+
+
                       <div class="text-muted text-center mt-15 mb-15">Don't have an account? <a href="/signup">Sign
                           up</a></div>
                     </div>
@@ -64,3 +108,89 @@
 </body>
 
 </html>
+
+<!-- 
+<script>
+  let otpTimer;
+  let otpExpirationTime = 300; // OTP expiration time in seconds (adjust as needed)
+
+  function startOTPTimer() {
+    clearInterval(otpTimer);
+
+    updateOTPTimerDisplay();
+
+    otpTimer = setInterval(function () {
+      otpExpirationTime--;
+
+      updateOTPTimerDisplay();
+
+      if (otpExpirationTime <= 0) {
+        clearInterval(otpTimer);
+        document.getElementById('otp').value = ''; // Clear OTP field
+        document.getElementById('resend-btn').style.display = 'inline'; // Display Resend button
+        document.getElementById('timerdiv').style.display = 'none'; // Hide timer
+      }
+    }, 1000);
+  }
+
+  function updateOTPTimerDisplay() {
+    let minutes = Math.floor(otpExpirationTime / 60);
+    let seconds = otpExpirationTime % 60;
+    let displayTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+    document.getElementById('timer').innerText = displayTime;
+  }
+
+  function resendOTP() {
+    // Implement your logic to resend the OTP here
+    // You can make a fetch request to the server to resend the OTP
+    // For demonstration purposes, let's assume the server-side logic is handled
+
+    // Clear existing timer
+    clearInterval(otpTimer);
+
+    // Reset timer values
+    otpExpirationTime = 100;
+    
+    // Hide Resend button and display timer
+    document.getElementById('resend-btn').style.display = 'none';
+    document.getElementById('timerdiv').style.display = 'inline';
+
+    // Start the timer again
+    startOTPTimer();
+  }
+</script> -->
+
+<!-- Add this script at the end of your HTML body or in a separate script file -->
+<script>
+  // Function to start the OTP timer
+  function startOTPTimer() {
+    var timer = 60; // Set the initial timer value in seconds
+
+    var timerInterval = setInterval(function () {
+      document.getElementById('timerdiv').style.display = 'block';
+      document.getElementById('timer').innerText = timer;
+      timer--;
+
+      if (timer < 0) {
+        clearInterval(timerInterval);
+        document.getElementById('timerdiv').style.display = 'none';
+        document.getElementById('resend-btn').style.display = 'block';
+      }
+    }, 1000);
+  }
+
+  // Function to resend OTP (you can implement your resend logic here)
+  function resendOTP() {
+    // Implement your OTP resend logic here
+
+    // Start the timer again after resending OTP
+    startOTPTimer();
+  }
+
+  // Call the startOTPTimer function when the page loads
+  window.onload = function () {
+    startOTPTimer();
+  };
+</script>
+
