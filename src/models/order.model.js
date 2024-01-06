@@ -359,6 +359,21 @@ class orderModel {
 				status: changeStatus
 			}
 		});
+		if (changeStatus === 'returned' || changeStatus === 'canceled' && orderResult.paymentmethod !== 'cashOnDelivery') {
+			const orderResult = await orderDatabase.findById(orderId).select('total user');
+			const { total, user } = orderResult;
+			const userResult = await userDatabase.findById(user).select('wallet');
+			const wallet = userResult.wallet;
+			const updatedWallet = wallet + total;
+			await userDatabase.findByIdAndUpdate(user, {
+			  $set: {
+				wallet: updatedWallet,
+			  },
+			});
+		  }
+		  if(changeStatus === 'returned' || changeStatus  === 'canceled'){
+			await updateProductStocks(orderId, changeStatus);
+		  }
 		if (orderResult) {
 			return { status: true, message: "order updated" };
 		} else {
@@ -399,7 +414,6 @@ class orderModel {
 				await new Promise((resolve) => setTimeout(resolve, 0));
 				pendingAmount += order.total;
 			}
-
 			if (amount) {
 				return { status: true, amount: amount.wallet, pendingWallet: pendingAmount };
 			} else {
@@ -410,7 +424,6 @@ class orderModel {
 			throw new Error("Oops!something went wrong while fetching wallet");
 		}
 	}
-
 	async getUserData(userId) {
 		try {
 			const amount = await userDatabase.findById(userId).select("wallet");

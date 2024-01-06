@@ -35,7 +35,18 @@ const userSchema = new mongoose.Schema({
 	address: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "address"
-	}
+	},
+	wallet:{
+		type:Number,
+		default:0
+	  },
+	  couponHistory: {
+		type: [{
+		  type: mongoose.Schema.Types.ObjectId,
+		  ref: 'Coupon',
+		}],
+		default: [],
+	  },
 });
 
 userSchema.pre("save", async function () {
