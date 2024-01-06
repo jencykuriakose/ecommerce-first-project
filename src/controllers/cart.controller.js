@@ -6,7 +6,6 @@ const cartModel = new CartModel();
 const GetCart = async (req, res) => {
 	if (req.session.user) {
 		const userId = req.session.user._id;
-		console.log(req.session);
 		const cartResult = await cartModel.fetchCartProducts(userId);
 		console.log(userId);
 		console.log(cartResult);
@@ -17,7 +16,6 @@ const GetCart = async (req, res) => {
 				price: item.price
 			}));
 			// console.log(items, cartResult.total);
-			
 			return res.render("user/cart", { items, total: cartResult.total });
 		}
 	} else {
@@ -96,7 +94,59 @@ const cartResult = await cartModel.updateCartDetails(quantity, productId, userId
   } 
 
 
+  const getWishlist=async (req,res)=>{
+	const userId=req.session.user._id;
+	const wishlistresult= await cartModel.fetchCartProducts(userId);
+	if(wishlistresult.status){
+		const items=wishlistresult.wishlist.item.map((item)=>({
+			product:items.product,
+			quantity:item.quantity,
+			price:item.price,
+		}));
+		return res.render('user/wishlist',{items})	
+	}
+	return res.render('user/wishlist',{items:[]})
+  }
 
+
+
+
+  const postWishlist=async(req,res)=>{
+	const  {productId}=req.body;
+	const userId=req.session.user._id;
+	if (!productId || typeof productId !== 'string') {
+		return res
+		  .status(400)
+		  .json({ success: false, message: 'Invalid product id' });
+	  }
+	  const wishlistItem = await cartModel.addItemToWishlist(userId, productId);
+	  if (wishlistItem.status) {
+		res
+		.status(200)
+		.json({ success: wishlistItem.status, message: wishlistItem.message, product: wishlistItem.productData ,productAlreadyExist:wishlistItem.productAlreadyExist});
+	  } else {
+		res
+		  .status(404)
+		  .json({ success: wishlistItem.status, message: wishlistItem.message, product: [] });
+	  }
+  }
+
+const RemoveFromWishlist=async(req,res)=>{
+	const {productId}= req.body;
+	const userId=req.session.user._id;
+	if(!productId || typeof productId !=='string'){
+		return res.status(400).json({status:false,message:'invalid product id' });
+	}
+	const wishlistResult= await cartModel.RemoveFromWishlist(userId,productId);
+	if(wishlistResult.status){
+		res.status(200).json({status:wishlistResult.status,message:wishlistResult.message});
+	}
+	else{
+		res.status(400).json({status:wishlistResult.status,message:wishlistResult.message});
+	}
+
+	
+}
 
 
 
@@ -106,5 +156,8 @@ module.exports = {
 	PostToCart,
 	RemoveFromCart,
 	ClearCart,
-	UpdateQuantity
+	UpdateQuantity,
+	getWishlist,
+	postWishlist,
+	RemoveFromWishlist
 };

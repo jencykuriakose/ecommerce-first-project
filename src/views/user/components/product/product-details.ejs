@@ -1,5 +1,6 @@
 <div class="col-md-6 col-sm-12 col-xs-12">
     <div class="detail-info">
+        <% console.log(product) %>
         <h2 class="title-detail"><%= product.productName %></h2>
         <div class="product-detail-rating">
             <div class="pro-details-brand">
@@ -17,8 +18,13 @@
         <div class="clearfix product-price-cover">
             <div class="product-price primary-color float-left">
                 <ins><span class="text-brand">&#8377;  <%= product.productPrice %></span></ins>
-                <ins><span class="old-price font-md ml-15">&#8377; <%= product.productOldPrice %></span></ins>
-                <span class="save-price  font-md color3 ml-15"><%= Math.floor(((product.productOldPrice - product.productPrice) / product.productOldPrice) * 100) %>%Off</span>
+                <ins><span class="old-price font-md ml-15">&#8377; <%= product.productoldprice %></span></ins>
+                <!-- <span class="save-price  font-md color3 ml-15"><%#=(Math.floor((product.productPrice-product.productoldprice) / product.productoldprice) * 100) %> %Off</span> -->
+                <span class="save-price font-md color3 ml-15">
+                    <% const discount=product.productPrice-product.productoldprice %>
+                    <% const discountPercentage = Math.floor((discount/product.productPrice)*100)%>
+                    <%= discountPercentage.toFixed(2) %> %Off
+                </span>
             </div>
         </div>
         <div class="bt-1 border-color-1 mt-15 mb-15"></div>

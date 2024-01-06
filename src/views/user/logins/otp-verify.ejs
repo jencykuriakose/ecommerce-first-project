@@ -66,13 +66,14 @@
                       <form id="otp-form">
                         <div class="form-group">
                           <input id="otp" name="otp" class="form-control" placeholder="Enter OTP" type="text">
+                          <p id="phone" value="<%- phone %>" hidden></p>
                           <div id="otp-error" class="invalid-feedback"></div>
                         </div>
                         <div class="form-group">
                           <button type="submit" class="btn btn-fill-out btn-block w-100 hover-up" name="verify" id="verify-button">VERIFY OTP</button>
                           <span id="timerdiv" style="display: none;"> Resend OTP in: <span id="timer"></span></span>
                           <!-- <p id="resend-btn" style="display: none;">Didn't receive an OTP? < type="text" class="resbtn" onclick="resendOTP()">Resend OTP</p> -->
-                          <p id="resend-btn" style="display: none;">Didn't receive an OTP? <span class="resbtn" onclick="resendOTP()">Resend OTP</span></p>
+                          <p id="resend-btn" style="display: none;">Didn't receive an OTP? <span class="resbtn" onclick="sendOTP()">Resend OTP</span></p>
 
                         </div>
                       </form>
@@ -104,6 +105,7 @@
     <%- include("../layouts/footer.ejs") %>
     <%- include("../script/script.ejs") %>
     <%- include("./validation/otp-validation.ejs") %>
+    <%- include("./validation/phonenumber-validation.ejs") %>
 
 </body>
 
@@ -165,7 +167,7 @@
 <script>
   // Function to start the OTP timer
   function startOTPTimer() {
-    var timer = 60; // Set the initial timer value in seconds
+    var timer = 50; // Set the initial timer value in seconds
 
     var timerInterval = setInterval(function () {
       document.getElementById('timerdiv').style.display = 'block';
@@ -176,19 +178,26 @@
         clearInterval(timerInterval);
         document.getElementById('timerdiv').style.display = 'none';
         document.getElementById('resend-btn').style.display = 'block';
+        document.getElementById('verify-button').disabled=true;
+      }else{
+      document.getElementById('verify-button').disabled=false;
       }
     }, 1000);
   }
 
   // Function to resend OTP (you can implement your resend logic here)
-  function resendOTP() {
+
+  function sendOTP() {
+
     // Implement your OTP resend logic here
 
     // Start the timer again after resending OTP
+
     startOTPTimer();
   }
 
   // Call the startOTPTimer function when the page loads
+
   window.onload = function () {
     startOTPTimer();
   };

@@ -2,6 +2,7 @@
 const productDatabase=require('../schema/product.schema');
 const userDatabase=require('../schema/user.schema');
 const cartDatabase=require('../schema/cart.schema');
+const wishlistDatabase=require('../schema/wishlist.schema');
 
 
 class cartModel {
@@ -69,6 +70,8 @@ class cartModel {
 
 
 async fetchCartProducts(userId){
+  console.log('request');
+  
     const cart=await cartDatabase.findOne({user:userId}).populate('items.product');
     if(!cart){
         return {status:false, cart ,total :0 };
@@ -121,7 +124,7 @@ async RemoveItemFromCart(userId,productId){
         };
       } else {
 
-        return { status: false, message: 'product not found in cart' };
+        return { status: false, message: 'product not found in cart'};
 
       }
 
@@ -177,22 +180,98 @@ async RemoveItemFromCart(userId,productId){
   } 
   
 
+async fetchCartProducts(userId){
+  const cart=await cartDatabase.findOne({user:userId}).populate('items.product');
+  if(!cart){
+    return { status: false, cart, total: 0 };
+    } else {
+      const total = cart.items.reduce((acc, item) => {
+        return acc + item.quantity * item.price;
+      }, 0);
+      return { status: true, cart, total };
+    }
+  }
+
+
+
+async addItemToWishlist(userId,productId){
+
+  const product = await productDatabase
+ 
+  .findById(productId)
+  .select('productPrice productimageurl productName _id stocks');
+if (!product) {
+
+  return { status: false, message: 'product not found' };
+}
+
+let wishlist = await wishlistDatabase.findOne({ user: userId });
+let productAlreadyExist = false;
+if (wishlist) {
+  const itemIndex = wishlist.items.findIndex((item) => item.product.equals(productId));
+  if (itemIndex >= 0) {
+    productAlreadyExist = true;
+    return {
+      status: false,
+      message: 'product already exists!',
+      productData: product, productAlreadyExist
+    }
+  } else {
+    wishlist.items.push({
+      product: productId,
+      price: product.productPrice,
+    });
+    await wishlist.save();
+    return {
+      status: true,
+      message: 'product added to cart',
+      productData: product, productAlreadyExist
+    }
+  }
+} else {
+  const newWishlist = await wishlistDatabase.create({
+    user: userId,
+    items: [
+      {
+        product: productId,
+        price: product.productPrice,
+      }
+    ]
+  })
+  await userDatabase.findByIdAndUpdate(userId, { wishlist: newWishlist._id });
+  return {
+    status: true,
+    message: 'product added to cart',
+    productData: product,
+  };
+}
+}
+
+async RemoveItemFromWishlist(userId,productId){
+  const product=await productDatabase.findById(productId).select('productprice');
+  if(!product){
+    return {status:false,message:'product not found'};
+  }
+  let wishlist = await wishlistDatabase.findOne({ user: userId });
+     const itemIndex = wishlist.items.findIndex((item) => item.product.equals(productId));
+    if (itemIndex > -1) {
+      wishlist.items.splice(itemIndex, 1);
+      await wishlist.save();
+      return {
+        status: true,
+        message: 'product removed from Wishlist',
+      };
+    } else {
+      return { status: false, message: 'product not found in wishlist' };
+    }
+
+  } catch (error) {
+    throw new Error('Something went wrong while removing product from cart');
+  }
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-}  
+} 
   module.exports=cartModel;

@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
     window.addEventListener("DOMContentLoaded", (event) => {
 
     let searchInput = document.getElementById('searchInput');
@@ -32,7 +32,7 @@
     });
 
 
-</script>
+</script> -->
 <header class="header-area header-style-1 header-height-2">
     <% if (!locals.user) { %>
         <div class="header-top header-top-ptb-1 d-none d-lg-block">
@@ -51,7 +51,7 @@
                             <div id="news-flash" class="d-inline-block">
                                 <ul>
                                     <li>Get great devices up to 50% off <a href="/shop">View details</a></li>
-                                    <li>Supper Value Deals - Save more with coupons</li>
+                                    <li>Supper Value Deals💥 - Save more with coupons</li>
                                     <li> save up 35% off today <a href="/shop">Shop now</a></li>
                                 </ul>
                             </div>
@@ -60,18 +60,6 @@
                     <div class="col-xl-3 col-lg-4">
                         <div class="header-info header-info-right">
                             <ul>
-                                <li>
-                                    <a class="language-dropdown-active" href="#"> <i class="fi-rs-world"></i> English <i
-                                            class="fi-rs-angle-small-down"></i></a>
-                                    <ul class="language-dropdown">
-                                        <li><a href="#"><img src="/user/assets/imgs/theme/flag-fr.png"
-                                                    alt="">Français</a></li>
-                                        <li><a href="#"><img src="/user/assets/imgs/theme/flag-dt.png"
-                                                    alt="">Deutsch</a></li>
-                                        <li><a href="#"><img src="/user/assets/imgs/theme/flag-ru.png"
-                                                    alt="">Pусский</a></li>
-                                    </ul>
-                                </li>
                                 <li><i class="fi-rs-user"></i><a href="/login">Log In / Sign Up</a></li>
                             </ul>
                         </div>
@@ -91,13 +79,9 @@
                         </div>
                         <div class="header-right">
                             <div class="search-style-2">
-                                <form>
-                                    <select class="select-active" id="categorySelect">
-                                      
-                                    </select>
-                                    <input type="text" id="searchInput" placeholder="Search for items...">
-
-                                </form>
+                                <form action="/search-result" method="GET">
+                                    <input class="custom-input" type="text" name="keyword" id="searchInput" placeholder="Search for items...">
+                                  </form>
 
                             </div>
                             <div class="header-action-right">

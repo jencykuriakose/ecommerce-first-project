@@ -1,6 +1,7 @@
 const ProductModel = require("../models/product.model");
 const CategoryModel = require("../models/category.model");
 const {addProductSchema, updateproductschema } = require("../config/joi");
+const { handleError } = require("../middleware/error-handler.middleware");
 
 
 const productModel = new ProductModel();
@@ -122,10 +123,11 @@ const getallproducts=async (req,res)=>{
 	const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const sortBy = req.query.sortBy;
-
-
-
+	console.log(sortBy)
+	console.log('Hello how are you')
     const allProductsResult = await productModel.GetAllproducts(page, limit, sortBy);
+	console.log(allProductsResult);
+	console.log("At the end of the product");
     res.render('user/all-products',
 	 {
       products: allProductsResult.products,
@@ -133,6 +135,7 @@ const getallproducts=async (req,res)=>{
       currentPage: allProductsResult.currentPage,
       limit: allProductsResult.limit,
       productCount: allProductsResult.productCount,
+	  sortOption:sortBy
     });
 }
 
@@ -148,12 +151,12 @@ const LoadProductDetails = async (req, res) => {
 
 	const productResult = await productModel.LoadProductDetails(productId);
 	console.log(productResult);
-	const allproductResult = await productModel.GetAllproducts();
+	// const allproductResult = await productModel.GetAllproducts();
 
 	if (productResult.status) {
 		res.render("user/product", {
 			product: productResult.product,
-			products: allproductResult.products
+			// products: allproductResult.products
 		});
 	} else {
 		res.status(404).render("user/404", {
@@ -167,6 +170,39 @@ const GetProductImages = async (req, res) => {
 	const images = await productModel.getProductImage(req.params.id);
 	res.json(images);
 };
+
+
+// const ProductBySearch=async (req,res)=>{
+// 	try{
+// 		const searchTerm=req.body.searchInput.trim();
+// 		const searchRegex=new RegExp(`^${searchTerm}`, 'i');
+// 		const products= await productModel.searchProductsWithRegex(searchRegex);
+// 		if(products.lenght> 0){
+//           req.session.searchproducts=products;
+// 		  return res.json({status:true,productCount:products.lenght});
+// 		}
+// 		else{
+// 			return res.json({status:false,productCount:products.lenght});
+// 		}
+// 	}catch(error){
+		
+// 		handleError(res,error);
+// 	}
+// }
+
+const ProductBySearch = async (req, res) => {
+    try {
+        const searchTerm = req.query.keyword;
+		console.log(searchTerm)
+        const searchRegex = new RegExp(`^${searchTerm}`, 'gi');
+        const searchproducts = await productModel.searchProductsWithRegex(searchRegex);
+		res.render('user/search-result',{products:searchproducts});
+    } catch (error) {
+        handleError(res, error);
+    }
+}
+
+
 
 
 
@@ -184,6 +220,7 @@ module.exports = {
 	GetEditProduct,
 	GetProductImages,
 	PutEditProduct,
-	getallproducts
+	getallproducts,
+	ProductBySearch
 	
 };

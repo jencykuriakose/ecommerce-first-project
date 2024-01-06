@@ -84,6 +84,7 @@ class UserModel {
 	async updateuserdata(userData,profileimage,userId){
 		if (typeof userData !== 'object' || typeof userId !== 'string') {
 			throw new Error('Invalid parameters');
+			
 		  }
 		  const user = await UserDatabase.findById(userId);
 		  if (!user) {
@@ -130,9 +131,30 @@ class UserModel {
 
 
 
-
-
-
+	async ResetPassword(phone ,password){
+		const user=await UserDatabase.findOne({phone})
+		if(!user){
+			throw new Error('user does not exist!');
+		}
+		if(!user.status){
+			return {status:false,message:'user is blocked'}
+		}
+		const dataObj={};
+		dataObj.password=await hashPassword(password);
+		const result=await UserDatabase.findByIdAndUpdate(
+			{phone:parseFloat(phone)},
+			{$set:{password:dataObj.password}},
+			{new:true}
+		);
+		if(result){
+			return {status:true,message:'update successfully'};
+		}else{
+			return {status:false,message:'not updated'};
+		}
+	}catch(error){
+		console.error(error.message);
+		return {status:false,message:error.message};
+	}
 
 
 

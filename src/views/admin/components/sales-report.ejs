@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <%- include("../partials/admin-header") %>
+</head>
+
+<body>
+
+    <div class="screen-overlay"></div>
+    <!-- aside -->
+    <%- include("./layout/sidebar.ejs") %>
+
+    <main class="main-wrap">
+    <%- include("./layout/admin-header.ejs") %>
+   
+
+    <section class="content-main">
+    
+        <!-- <h1>Main Dashboard</h1> -->
+
+        <%- include('./components/sale-report/sales-report.ejs') %>
+
+        <!-- <- include('./components/dashboard/sale-statitics.ejs') %> -->
+
+        <div class="row">
+            
+            
+        </div>
+        
+    </section> <!-- content-main end// -->
+
+    <%- include("./layout/footer.ejs") %>
+</main>
+<%- include("./components/script/script.ejs") %>
+</body>
+
+</html>

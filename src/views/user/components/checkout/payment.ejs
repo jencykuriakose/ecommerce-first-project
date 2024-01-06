@@ -233,6 +233,7 @@
 <script src="/user/assets/js/custom/ajaxCart.js"></script>
 
 <!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
 
@@ -681,10 +682,10 @@
     function razorpayPayment(order) {
         console.log(order);
         var options = {
-            "key": "rzp_test_mfG6Xukc148Lkm", // Enter the Key ID generated from the Dashboard
+            "key": "rzp_test_ZAX3wtcRlXdMGA", // Enter the Key ID generated from the Dashboard
             "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
             "currency": "INR",
-            "name": "space", //your business name
+            "name": "THROTTLE", //your business name
             "description": "Test Transaction",
             "image": "/user/assets/imgs/theme/logo.svg",
             "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
@@ -720,7 +721,8 @@
             type: 'post',
             url: '/verify-payment',
             data: {
-                payment, order
+                payment,
+                order
             }, success: (response) => {
                 const id = order.receipt;
                 console.log(order.receipt);

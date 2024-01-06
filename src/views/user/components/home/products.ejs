@@ -109,7 +109,7 @@
                                         </div>
                                         <div class="product-content-wrap">
                                             <div class="product-category">
-                                                <a href="/product/<%= product.slug %>">
+                                                <a href="/product/<%= product._id %>">
                                                     <div class="product-category">
                                                         <a href="/all-products">
                                                             <%= product.productCategory.name %>
@@ -117,7 +117,7 @@
                                                     </div>
                                                 </a>
                                             </div>
-                                            <h2><a href="/product/<%= product.slug %>"><%- product.productName %></a></h2>
+                                            <h2><a href="/product/<%= product._id %>"><%- product.productName %></a></h2>
                                             <div class="rating-result" title="90%">
                                                 <span>
                                                     <span>90%</span>

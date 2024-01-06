@@ -38,6 +38,8 @@ userRouter.route("/login").post(userController.postloginverify);
 
  userRouter.route('/forgot-password').get(userController.GenerateUniquePassword);
 
+ userRouter.route('/ResetPassword').post(userController.ResetPassword);
+ 
 userRouter.route("/account").get(IsLoggedIn,userController.getaccount);
 
 // userRouter.route('/update-userdata',(req,res,next)=>{console.log(req.file);},'/update-userdata',upload.single('profileimage')),userController.updateuserdata);
@@ -63,17 +65,43 @@ userRouter.route('/checkout').get(IsLoggedIn,orderController.GetCheckOut);
 
 userRouter.route('/checkout').post(IsLoggedIn,orderController.PostCheckOut);
 
+userRouter.route('/verify-payment').post(IsLoggedIn, orderController.VerifyPayment)
+
 userRouter.route('/order-successfull/:id').get(IsLoggedIn,orderController.SuccessPage);
 
 userRouter.route('/order-cancel').post(IsLoggedIn,orderController.CancelOrder);
 
 userRouter.route('/order-details').get(IsLoggedIn,orderController.getOrderDetails);
 
+userRouter.route('/order-return').post(IsLoggedIn,orderController.returnOrder);
+
 userRouter.route('/add-address').post(IsLoggedIn,orderController.AddAddress);
 
 userRouter.route('/delete-address').delete(IsLoggedIn,orderController.DeleteAddress);
 
 userRouter.route('/logout').get(userController.getlogout);
+
+userRouter.route('/wallet').get(IsLoggedIn,orderController.GetWallet);
+
+userRouter.route('/apply-wallet').post(IsLoggedIn,orderController.ApplyWallet);
+
+// userRouter.route('*').get(userController.get404);
+
+userRouter.route('/invoice').get(userController.getInvoice);
+
+ userRouter.route('/wishlist').get(IsLoggedIn,cartController.getWishlist);
+
+ userRouter.route('/wishlist').post(IsLoggedIn,cartController.postWishlist);
+
+ userRouter.route('/wishlist').delete(IsLoggedIn,cartController.RemoveFromWishlist);
+
+//  userRouter.route('/apply-coupon').get(IsLoggedIn,)
+
+ userRouter.route('/search-result').get(productController.ProductBySearch);
+
+ userRouter.route('/')
+
+
 
 
 module.exports = userRouter;

@@ -16,7 +16,7 @@ class CategoryModel {
 	}
 
 	async addCategory(name) {
-		const isCategoryExist = await categoryDatabase.findOne({ name });
+		const isCategoryExist = await categoryDatabase.findOne({ name:{ $regex: new RegExp(`^${name}$`, 'i') } });
 		if (isCategoryExist) {
 			return { status: false, message: `Category name already exsist` };
 		}

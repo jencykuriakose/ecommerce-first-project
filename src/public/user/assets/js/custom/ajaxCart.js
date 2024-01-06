@@ -132,8 +132,10 @@ quantityDivs.forEach((quantityDiv) => {
 
   qtyDownBtn.addEventListener('click', () => {
     const currentQty = parseInt(qtySpan.dataset.quantity);
+    console.log(currentQty)
     if (currentQty > 1) {
       const newQty = currentQty - 1;
+      console.log(newQty)
       qtySpan.dataset.quantity = newQty;
       qtySpan.textContent = newQty;
 

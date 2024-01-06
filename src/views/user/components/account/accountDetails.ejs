@@ -73,11 +73,13 @@
 					<div class="form-group col-md-12">
 						<label>New Password</label>
 						<input class="form-control square" name="npassword" type="password" />
+						<div class="error" id="npasswordError"></div>
 					</div>
 
 					<div class="form-group col-md-12">
 						<label>Confirm Password</label>
 						<input class="form-control square" name="cpassword" type="password" />
+						<div class="error" id="cpasswordError"></div>
 					</div>
 					<div class="col-md-12">
                         <button type="submit" class="btn btn-fill-out submit" id="buttonSub" name="submit"
@@ -178,6 +180,7 @@
 	form1.addEventListener('submit', (event) => {
 	    event.preventDefault();
 	    const passwordError=document.querySelector('#passwordError')
+	   
 	    passwordError.innerHTML=''
 	    let hasError=false;
 	    const formData = new FormData(form1);
@@ -189,10 +192,33 @@
 	        }, 5000);
 	        return;
 	    }
+		const newPassword = formData.get('npassword').trim();
+    	const confirmPassword = formData.get('cpassword').trim();
+		const cpasswordError=document.querySelector('#cpasswordError')
+		const npasswordError=document.querySelector('#npasswordError')
+		const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+	    npasswordError.innerHTML=''
+	    cpasswordError.innerHTML=''
+
+    	if (newPassword !== confirmPassword) {
+        	hasError = true;
+        	cpasswordError.innerHTML += '<p style="color:red">New password and confirm password do not match.</p>';
+			setTimeout(() => {
+	            cpasswordError.innerHTML = ''
+	        }, 5000);
+	        return;
+    	}else if (!passwordRegex.test(newPassword)) {
+			hasError=true
+            npasswordError.innerHTML += '<p style="color:red">New password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number."</p>';
+			setTimeout(() => {
+	            npasswordError.innerHTML = ''
+	        }, 5000);
+	        return;
+        }
         if (croppedImage !== null) {
          formData.delete('profileimage');
          formData.append('profileimage', croppedImage, 'cropped_image.jpg');
-    }
+    	}
 	    const formObject = {};
 	 if(!hasError){
 	        formData.forEach(function (key, value) {

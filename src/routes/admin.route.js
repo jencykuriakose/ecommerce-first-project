@@ -12,7 +12,9 @@ const ordercontroller=require("../controllers/order.controller");
 
 const upload = require("../config/multer");
 
-adminRouter.route("/")
+const { get404 } = require("../controllers/user.controller");
+
+adminRouter.route("/");
 
 adminRouter.route("/login").get(adminController.getadminlogin).post(adminController.PostLogin);
 
@@ -49,11 +51,20 @@ adminRouter.route("/categories").get(IsAdminLoggedIn, adminController.GetCategor
 
 adminRouter.route("/category-status").put(IsAdminLoggedIn, adminController.putCategory);
 
-adminRouter.route("/sales-report").get(IsAdminLoggedIn,adminController.getReport);
+//  adminRouter.route("/sales-report").get(IsAdminLoggedIn,adminController.getReport);
+
+ adminRouter.route("/sales-report").get(IsAdminLoggedIn,adminController.DisplayReport);
+
+ adminRouter.route('/sales-report/download').get(IsAdminLoggedIn,adminController.getReport);
+
+adminRouter.route('/sales-report/download-excel').get(IsAdminLoggedIn,adminController.GetReportExcel);
 
 adminRouter.route("/graph").get(IsAdminLoggedIn,adminController.getGraphData);
 
-// adminRouter.route("/chart").get(IsAdminLoggedIn,adminController.getChartData);
+  adminRouter.route("/chart").get(IsAdminLoggedIn,adminController.ChartData);
+
+// adminRouter.route('*').get(adminController.get404);
+
 
 
 module.exports = adminRouter;

@@ -4,7 +4,8 @@ const UserModel = require("../models/userAuth.model");
 const CategoryModel = require("../models/category.model");
 const adminModel=require("../models/admin.model");
 const orderModel=require("../models/order.model");
-
+const {handleError}=require('../middleware/error-handler.middleware')
+const { generateSalesReportExcel } = require('../config/excel');
 // const { get } = require("mongoose");
 const {generateSalesReport} =require("../config/pdfKit");
 //  const orderModel = require("../models/order.model");
@@ -110,8 +111,20 @@ const AddProducts = async (req, res) => {
 
 
 const getReport=async(req,res)=>{
-const reportData=await ordermodel.getorderData();
-generateSalesReport(reportData,res);
+	try {
+		const startDate = req.query.startDate;
+		const endDate = req.query.endDate;
+		let reportData;
+		if (startDate == 'null' && endDate === 'null') {
+		  reportData = await ordermodel.getorderData();
+		  generateSalesReport(reportData, res);
+		} else {
+		  reportData = await ordermodel.getOrders(startDate, endDate);
+		  generateSalesReport(reportData, res);
+		}
+	  } catch (error) {
+		handleError(res, error);
+	  }
 }
 
 
@@ -134,6 +147,79 @@ const getGraphData=async (req,res)=>{
 		res.status(500).json({ success: false, message: 'Internal server error' });
 	  }
 }
+
+
+
+const ChartData=async (req,res)=>{
+	try{
+const result=await adminmodel.ChartData();
+if(result.status){
+	const {popularProducts}=result;
+	const labels = popularProducts.map((product) => product.productName);
+      const data = popularProducts.map((product) => product.totalOrders);
+      const stocks = popularProducts.map((product) => product.stocks); // Fetch product stock data
+
+
+	  return res.json({
+        success: true,
+        labels,
+        data,
+        stocks,
+      });
+	} else {
+		return res.json({
+		  success: false,
+		  message: 'Oops! Something went wrong. Chart data not found.',
+		});
+	  
+}
+	}catch(error){
+		console.error('error fetching chart data',error);
+		res.status(500).json({success:false,message:'Internal server error'});
+	}
+}
+
+const DisplayReport= async (req, res)=> {
+	try {
+	  const startDate = req.query.startDate;
+	  const endDate = req.query.endDate;
+	  console.log(startDate,endDate);
+	  const reportData = await ordermodel.getOrders(startDate,endDate);
+	  console.log(reportData)
+	  return res.status(200).json(reportData)
+	} catch (error) {
+		handleError(res,error)
+	}
+  }
+
+const GetReportExcel=async(req,res)=>{
+	try {
+		const startDate = req.query.startDate;
+		const endDate = req.query.endDate;
+		let reportData;
+		if (startDate === 'null' && endDate === 'null') {
+		  reportData = await ordermodel.getOrderData();
+		} else {
+		  reportData = await ordermodel.getOrders(startDate, endDate);
+		}
+		const workbook = await generateSalesReportExcel(reportData);
+		res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		res.setHeader('Content-Disposition', 'attachment; filename=sales-report.xlsx');
+		await workbook.xlsx.write(res);
+		res.end();
+	} catch (error) {
+		handleError(res,error)
+	}
+}
+
+
+
+
+//   const get404=async (req,res)=>{
+// 	res.status(404).render('user/404');
+// };
+
+
 	
 
 
@@ -147,7 +233,11 @@ module.exports = {
 	postCategories,
 	putCategory,
 	AddProducts,
-	getReport,
+    getReport,
 	getGraphData,
+	DisplayReport,
+	ChartData,
+	GetReportExcel
+	// get404
 	
 };

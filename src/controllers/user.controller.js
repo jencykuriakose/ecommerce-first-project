@@ -3,11 +3,14 @@ const UserModel = require("../models/userAuth.model");
 const ProductModel = require("../models/product.model");
 const CategoryModel = require("../models/category.model");
 const orderModel=require("../models/order.model");
-const { signupvalidationSchema, updateUserSchema } = require("../config/joi");
+const { signupvalidationSchema, updateUserSchema,resetPasswordSchema } = require("../config/joi");
 const { json } = require("body-parser");
 const bcrypt=require("bcrypt");
 const uuidv4=require('uuidv4');
 const { getOrderDetails } = require("./order.controller");
+const{ generateInvoice }=require("../config/pdfKit");
+const { handleError } = require("../middleware/error-handler.middleware");
+
 const userModel = new UserModel();
 
 const categoryModel = new CategoryModel();
@@ -17,6 +20,7 @@ const ordermodel=new orderModel();
 const getHome = async (req, res) => {
 	const productResult = await productmodel.GetAllproducts();
 	const categories = await categoryModel.fetchCategories();
+
 	if (productResult) {
 		res.status(200).render("user/home", {
 			products: productResult.products,
@@ -52,6 +56,7 @@ const postSignup = async (req, res) => {
 };
 
 const getLogin = async (req, res) => {
+	console.log("✅");
 	res.render("user/logins/login");
 };
 
@@ -68,7 +73,7 @@ const postSendOtp = async (req, res) => {
 
 const postloginverify = async (req, res) => {
 	const { email, password } = req.body;
-	console.log(email, password);
+	 console.log(email, password);
 	try {
 		const userResult = await userModel.CheckUserWithEmail(email, password);
 		console.log(userResult)
@@ -191,11 +196,44 @@ const getlogout = (req, res) => {
 
 
 const getInvoice=async ( req , res )=>{
+	try{
 	const id=req.query.id;
-	const invoicedata= await ordermodel.getOrderDetails(id);
+	const invoicedata= await ordermodel.OrderDetails(id);
 	generateInvoice(invoicedata,res);
-
+	}catch(error){
+    handleError(res,error);
+	}
 };
+
+
+const ResetPassword=async(req,res)=>{
+	try{
+		const {phone,password}=req.body;
+		const {error}=resetPasswordSchema.validate({password});
+		if(error){
+			return res.status(400).json({status:false,message:error.details[0].message});
+		}
+		const UpdatePassword=await userModel.ResetPassword(phone,password);
+		if(UpdatePassword.status){
+			return res.json({status:true,message:"password reset sucessfully"});
+		}else{
+			return res.json({status:false,message:"failed to reset password"});
+		}
+	}catch(error){
+handleError(res,error);
+	}
+}
+
+
+
+
+
+
+
+
+// const get404=async (req,res)=>{
+// 	res.status(404).render('user/404');
+// };
 
 
 
@@ -215,5 +253,8 @@ module.exports = {
 	updateuserdata,
 	getlogout,
 	GenerateUniquePassword,
-	getInvoice
+	ResetPassword,
+	getInvoice,
+	// get404
+	
 };

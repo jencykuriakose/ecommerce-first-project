@@ -13,11 +13,10 @@
     <tbody>
 
       <% items.forEach(item=> { %>
-
         <tr data-item-id="<%= item.product._id %>">
           <td class="image product-thumbnail"><img src="<%= item.product.productimageurl[0] %>" alt="#"></td>
           <td class="product-des product-name">
-            <h5 class="product-name"><a href="/product/<%= item.product.slug %>">
+            <h5 class="product-name"><a href="/product/<%= item.product._id %>">
                 <%= item.product.productName %>
               </a></h5>
             </p>
@@ -26,11 +25,11 @@
           <td class="text-center" data-title="Stock">
             <div class="detail-qty border radius  m-auto" data-stockqty="<%= item.product.stocks %>" data-productid="<%= item.product._id %>">
               <a class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-              <span class="qty-val qty-<%= item.product._id %>" id="qty-<%= item.product._id %>"
+              <span class="qty-val qty-<%=item.product._id%>" id="qty-<%= item.product._id %>"
                 data-quantity="<%= item.quantity %>">
                 <%= item.quantity %>
-
-              </span>
+            </span>
+            
 
               <a class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
             </div>
@@ -66,6 +65,20 @@
 </div>
 
 <script>
+
+// 
+
+function updateQuantity(productId, change) {
+    var stockQty = parseInt(document.querySelector('.detail-qty[data-productid="' + productId + '"]').getAttribute('data-stockqty'));
+    var currentQty = parseInt(document.getElementById('qty-' + productId).getAttribute('data-quantity'));
+
+    if (currentQty + change >= 0 && currentQty + change <= stockQty) {
+      // Update the quantity
+      document.getElementById('qty-' + productId).setAttribute('data-quantity', currentQty + change);
+      document.getElementById('qty-' + productId).innerText = currentQty + change;
+    }
+  }
+// 
 
   const clearCartLink = document.getElementById('clearCart');
   clearCartLink.addEventListener('click', () => {

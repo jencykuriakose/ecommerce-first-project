@@ -2,8 +2,10 @@ const orderDatabase = require("../schema/order.schema");
 const addressDatabase = require("../schema/address.schema");
 const cartDatabase = require("../schema/cart.schema");
 const productDatabase = require("../schema/product.schema");
+const userDatabase = require("../schema/user.schema");
 const { addressSchema } = require("../config/joi");
 const crypto = require("crypto");
+const moment = require("moment");
 
 class orderModel {
 	constructor() {}
@@ -39,7 +41,8 @@ class orderModel {
 	}
 
 	async AddOrderDetails(addressId, paymentMethod, userId, req, res) {
-		if (!"cashOnDelivery".includes(paymentMethod)) {
+		if (!["razorpay", "cashOnDelivery"].includes(paymentMethod)) {
+			console.log("payment method:", paymentMethod);
 			throw new Error("Invalid payment method");
 		}
 		//fetching the cart items and total
@@ -85,6 +88,17 @@ class orderModel {
 			return { status: true, order: order, cartResult };
 		} else {
 			return { status: false };
+		}
+	}
+
+	async verifyPayment(razorData, res) {
+		let expectsignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
+		expectsignature.update(razorData["payment[razorpay_order_id]"] + "|" + razorData["payment[razorpay_payment_id]"]);
+		expectsignature = expectsignature.digest("hex");
+		if (expectsignature === razorData["payment[razorpay_signature]"]) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -186,16 +200,14 @@ class orderModel {
 	async fetchorderuserdetails(userId, page, limit) {
 		const orders = await orderDatabase
 			.find({ user: userId })
-			.skip((page - 1) * limit)
-			.limit(limit)
+			// .skip((page - 1) * limit)
+			// .limit(limit)
 			.select("total status transactionId date items paymentStatus")
 			.sort({ date: -1 });
 
 		const totalOrder = await orderDatabase.countDocuments();
 		const totalPages = Math.ceil(totalOrder / limit);
-
 		const addresses = await addressDatabase.find({ user: userId });
-
 		const orderDetails = orders.map((order) => {
 			// Calculate the return date
 			const returnDate = new Date(order.date);
@@ -252,6 +264,40 @@ class orderModel {
 			})
 			.populate("shippingAddress")
 			.populate("user");
+		console.log(orders);
+		let reportData = [];
+
+		for (const order of orders) {
+			for (const item of order.items) {
+				const { product, quantity, price } = item;
+
+				const entry = {
+					date: order.date,
+					product: product.productName,
+					quantity,
+					price
+				};
+
+				reportData.push(entry);
+			}
+		}
+		console.log(reportData);
+		return reportData;
+	}
+
+	async getOrders(startDate, endDate) {
+		let query = { status: "delivered" };
+		if (startDate && endDate) {
+			query.date = { $gte: startDate, $lte: endDate };
+		}
+		const orders = await orderDatabase
+			.find(query)
+			.populate({
+				path: "items.product",
+				model: "Product"
+			})
+			.populate("shippingAddress")
+			.populate("user");
 
 		const reportData = [];
 
@@ -269,12 +315,42 @@ class orderModel {
 				reportData.push(entry);
 			}
 		}
+
 		return reportData;
+		// Calculate daily, weekly, and monthly aggregates
+
+		// const dailyAggregates = groupOrdersBy(reportData, 'day');
+		// const weeklyAggregates = groupOrdersBy(reportData, 'week');
+		// const monthlyAggregates = groupOrdersBy(reportData, 'month');
+		// return {
+		//     reportData,
+		//     dailyAggregates,
+		//     weeklyAggregates,
+		//     monthlyAggregates
+		// };
+	}
+
+	// Helper function to group orders by day, week, or month
+	async groupOrdersBy(orders, interval) {
+		const groupedOrders = {};
+
+		for (const entry of orders) {
+			const formattedDate = moment(entry.date).startOf(interval).format("YYYY-MM-DD");
+
+			if (!groupedOrders[formattedDate]) {
+				groupedOrders[formattedDate] = {
+					totalQuantity: 0,
+					totalPrice: 0
+				};
+			}
+
+			groupedOrders[formattedDate].totalQuantity += entry.quantity;
+			groupedOrders[formattedDate].totalPrice += entry.quantity * entry.price;
+		}
+		return groupedOrders;
 	}
 
 	async changeOrderStatus(changeStatus, orderId) {
-		
-
 		if (!["shipped", "delivered", "canceled", "returned"].includes(changeStatus)) {
 			throw new Error("Invalid status");
 		}
@@ -289,11 +365,80 @@ class orderModel {
 			return { status: false, message: "something goes wrong updation failed" };
 		}
 	}
+
+	async returnOrder(orderId, returnReason) {
+		try {
+			const result = await orderDatabase.updateOne(
+				{ _id: orderId },
+				{
+					$set: {
+						status: "returnPending",
+						retrun_reason: returnReason
+					}
+				}
+			);
+			return result?.modifiedCount === 1;
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	async getwallet(userId) {
+		try {
+			const amount = await userDatabase.findById(userId).select("wallet");
+			const pendingOrders = await orderDatabase
+				.find({
+					user: userId,
+					status: "returnPending"
+				})
+				.select("total");
+
+			let pendingAmount = 0;
+
+			for (let order of pendingOrders) {
+				await new Promise((resolve) => setTimeout(resolve, 0));
+				pendingAmount += order.total;
+			}
+
+			if (amount) {
+				return { status: true, amount: amount.wallet, pendingWallet: pendingAmount };
+			} else {
+				return { status: false, amount: 0, pendingWallet: pendingAmount };
+			}
+		} catch (error) {
+			console.error("error while fetching the wallet:", error);
+			throw new Error("Oops!something went wrong while fetching wallet");
+		}
+	}
+
+	async getUserData(userId) {
+		try {
+			const amount = await userDatabase.findById(userId).select("wallet");
+			if (amount) {
+				return { status: true, amount: amount.wallet };
+			} else {
+				return { status: false, amount: 0 };
+			}
+		} catch (error) {
+			throw new Error("error in finding user!");
+		}
+	}
+
+	async changePaymentStatus(orderId,paymentDetails,res){
+		try {
+			const changePaymentStatus=await orderDatabase.updateOne({_id:orderId},
+				{
+				$set:{
+					status:'processing',
+					paymentResponse:paymentDetails
+				}
+			})
+			return (changePaymentStatus.modifiedCount>0)? true: false;
+				
+		} catch (error) {
+			throw new Error("Error in changing payment status")
+		}
+	}
 }
 
 module.exports = orderModel;
-
-
-
-
-

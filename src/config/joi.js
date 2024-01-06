@@ -1,3 +1,4 @@
+const Joi = require("joi");
 const joi = require("joi");
 
 const signupvalidationSchema = joi.object({
@@ -109,7 +110,7 @@ const addressSchema = joi.object({
 	email: joi.string().trim().email().optional()
 });
 
-// update the userr data
+// update the userdata
 
 const updateUserSchema = joi.object({
 	profileimage: joi.any().optional(),
@@ -120,10 +121,22 @@ const updateUserSchema = joi.object({
 	cpassword: joi.any().valid(joi.ref("npassword")).allow("").optional()
 });
 
+
+
+// reset password 
+
+const resetPasswordSchema=Joi.object({
+	password:joi.string().trim().max(30).optional()
+})
+
+
+
+
 module.exports = {
 	signupvalidationSchema,
 	addProductSchema,
 	updateproductschema,
 	updateUserSchema,
-	addressSchema
+	addressSchema,
+	resetPasswordSchema
 };

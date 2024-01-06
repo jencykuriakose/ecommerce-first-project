@@ -1,21 +1,68 @@
 const productDatabase = require("../schema/product.schema");
 const cloudinary = require("../config/cloudinary");
+const { Error } = require("mongoose");
 
 class ProductModel {
 	constructor() {}
 
-	async GetAllproducts(page, limit) {
-		var products = await productDatabase.find({ productstatus: true }).populate("productCategory");
-		const totalProducts = await productDatabase.countDocuments();
-		const totalPages = Math.ceil(totalProducts / limit);
+	async GetAllproducts(page,limit,sortBy) {
+		let filterOptions={};
+		let sortOptions={}
+		console.log(page,sortBy,limit)
+		if (sortBy) {
+			switch (sortBy) {
+			  case 'featured':
+				filterOptions = { featured: true };
+				break;
+			  case 'lowToHigh':
+				sortOptions = { productPrice: 1 }; // Sort by price: low to high
+				break;
+			  case 'highToLow':
+				sortOptions = { productPrice: -1 }; // Sort by price: high to low
+				break;
+			  case 'releaseDate':
+				sortOptions = { createdAt: -1 }; // Sort by release date (descending)
+				break;
+			  default:
+				break;
+			}
+		  }
 
+		  let query = productDatabase.find({ productstatus: { $in: [true, false] } });
+
+		  if (Object.keys(filterOptions).length > 0) {
+			query = query.find(filterOptions);
+		  }
+		//   let sortOptions = {};
+  		// 	if (filterOptions.productPrice) {
+    	// 	sortOptions.productPrice = filterOptions.productPrice;
+  		// 	} else if (filterOptions.createdAt) {
+    	// 	sortOptions.createdAt = filterOptions.createdAt;
+ 		// 	}
+		console.log(filterOptions)
+		  let products = await query
+		  .populate('productCategory')
+		  .sort(sortOptions)
+		  .skip((page - 1) * limit)
+		  .limit(limit);
+		  console.log(products.length);
+		  console.log(filterOptions);
+		let totalProducts = await productDatabase.countDocuments({
+		  productstatus: { $in: [true, false] },
+		  ...filterOptions,
+		});
+	
+		let totalPages = Math.ceil(totalProducts / limit);
+		console.log(totalProducts)
+		console.log(totalPages)
 		return {
 			status: true,
 			products: products,
 			totalPages: totalPages,
 			currentPage: page,
 			limit: limit,
-			productCount: totalProducts
+			productCount: totalProducts,
+			sortOption:sortBy
 		};
 	}
 
@@ -128,6 +175,40 @@ async updateProduct(productId, productData, productimage) {
 
     return updatedProduct;
   }
+
+
+
+// async searchProductsWithRegex(searchRegex){
+// 	try{
+// const products=await productDatabase.find({productName:searchRegex});
+// return products;
+
+// 	}catch(error){
+// 		throw new Error('error while searcing product');
+// 	}
+// }
+
+// Updated searchProductsWithRegex function
+
+// async searchProductsWithRegex(searchRegex) {
+//     try {
+//         const products = await productDatabase.find({ productName: searchRegex });
+//         return products;
+//     } catch (error) {
+//         throw new Error('Error while searching for products');
+//     }
+// }
+async  searchProductsWithRegex(searchRegex) {
+	try {
+	  const products = await productDatabase.find({ productName: searchRegex });
+	  return products;
+	} catch (error) {
+	  throw new Error(`Error while searching products`);
+	}
+  }
+
+
+
 
 
 

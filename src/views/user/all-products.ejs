@@ -55,10 +55,11 @@
                                                 </div>
                                                 <div class="sort-by-dropdown-wrap">
                                                     <select id="sortByDropdown" onchange="handleSortByChange()">
-                                                        <option value="featured">Featured</option>
-                                                        <option  value="lowToHigh">Price: Low to High</option>
-                                                        <option value="highToLow">Price: High to Low</option>
-                                                        <option value="releaseDate">Release Date</option>
+                                                        <option value="all" <% if (sortOption === 'all') { %>selected<% } %>>All</option>
+                                                        <option value="featured" <% if (sortOption === 'featured') { %>selected<% } %>>Featured</option>
+                                                        <option value="lowToHigh" <% if (sortOption === 'lowToHigh') { %>selected<% } %>>Price: Low to High</option>
+                                                        <option value="highToLow" <% if (sortOption === 'highToLow') { %>selected<% } %>>Price: High to Low</option>
+                                                        <option value="releaseDate" <% if (sortOption === 'releaseDate') { %>selected<% } %>>Release Date</option>
                                                       </select>
                                                 </div>
                                             </div>
@@ -67,14 +68,12 @@
                                     </div>
                                 </div>
                                 <div class="row product-grid-3">
-
                                     <% products.forEach(product=> { %>
-
                                         <div class="col-lg-3 col-md-4">
                                             <div class="product-cart-wrap mb-30">
                                                 <div class="product-img-action-wrap">
                                                     <div class="product-img product-img-zoom">
-                                                        <a href="/product/<%= product.slug %>">
+                                                        <a href="/product/<%= product._id %>">
                                                             <img class="default-img"
                                                                 src="<%= product.productimageurl[0] %>" alt="">
                                                             <img class="hover-img"
@@ -86,7 +85,7 @@
                                                             data-bs-toggle="modal" data-bs-target="#quickViewModal">
                                                             <i class="fi-rs-search"></i></a>
                                                         <a aria-label="Add To Wishlist" class="action-btn hover-up"
-                                                            href="/wishlist/<%= product.slug %>"><i
+                                                            href="/wishlist/<%= product._id %>"><i
                                                                 class="fi-rs-heart"></i></a>
                                                         <a aria-label="Compare" class="action-btn hover-up" href="/"><i
                                                                 class="fi-rs-shuffle"></i></a>
@@ -110,7 +109,7 @@
                                                             <%= product.productCategory.name %>
                                                         </a>
                                                     </div>
-                                                    <h2><a href="/product/<%= product.slug %>">
+                                                    <h2><a href="/product/<%= product._id %>">
                                                             <%= product.productName %>
                                                         </a></h2>
                                                     <div class="rating-result" title="90%">
@@ -135,6 +134,8 @@
 
 
                                 </div>
+
+                                
                                 <!--pagination-->
                                 <div class="pagination-area mt-15 mb-50">
                                     <nav aria-label="Page navigation example">
@@ -181,6 +182,24 @@
         const limit = '<%= limit %>';
         const url = `/shop?page=${page}&limit=${limit}&sortBy=${sortBy}`;
         window.location.href = url;
+    }
+    function loadFromBackEnd(productId) {
+      fetch(`/product/images/${productId}`)
+        .then(response => response.json())
+        .then(data => {
+          const productImages = data.productimageurl;
+
+          // Update the quick view modal with the new images
+          const quickViewImages = document.querySelectorAll('.quick-view-image');
+          quickViewImages.forEach((image, index) => {
+            if (productImages[index]) {
+              image.src = productImages[index];
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
     }
 </script> 
 </html>

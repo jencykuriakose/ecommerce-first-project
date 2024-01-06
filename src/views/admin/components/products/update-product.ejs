@@ -209,6 +209,7 @@ document.getElementById('update-product-btn').addEventListener('click', (event) 
   }
 
   // Function to display the uploaded images
+  
   function displayImages() {
     var previewContainer = document.getElementById('image-preview');
     previewContainer.innerHTML = '';
@@ -244,6 +245,7 @@ document.getElementById('update-product-btn').addEventListener('click', (event) 
   }
 
   // Function to handle image selection
+
   function imageSelect() {
     var fileInput = document.getElementById('productImage');
     var files = fileInput.files;
@@ -263,6 +265,7 @@ document.getElementById('update-product-btn').addEventListener('click', (event) 
   }
 
   // Function to delete an image
+
   function deleteImage(index) {
     uploadedImages.splice(index, 1);
     displayImages();

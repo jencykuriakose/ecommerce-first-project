@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
               newCartItem.innerHTML = `
                 <div class="shopping-cart-img">
                   <a href="/product"><img alt="${data.product.productName}" src="${
-                data.product.productimageurs[0]
+                data.product.productimageurl[0]
               }"></a>
                 </div>
                 <div class="shopping-cart-title">

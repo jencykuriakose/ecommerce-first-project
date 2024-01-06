@@ -2,9 +2,12 @@ const productDatabase = require("../schema/product.schema");
 // const cartModel = require('../models/cart.model');
 const cartModel = require("../models/cart.model");
 const orderModel = require("../models/order.model");
+const Razorpay=require("../config/rayzorpay");
+const { handleError } = require("../middleware/error-handler.middleware");
 
 const ordermodel = new orderModel();
 const cartmodel = new cartModel();
+
 
 // admin view the order page
 
@@ -95,12 +98,49 @@ const PostCheckOut = async (req, res) => {
 			});
 			
 		}
+			else if(paymentmethod==='razorpay'){
+				const razorPayOrder= await Razorpay.generateRazorpay(checkoutResult.order);
+				return res.json({
+					success:true,
+					paymethod:'ONLINE',
+					message:'order details added!',
+					order:razorPayOrder,
+				});
+			}
 	} else {
 		return res.json({ success: false, message: "something goes wrong" });
 	}
 };
 
 
+const VerifyPayment=async (req , res) =>{
+	console.log(req.body)
+	console.log('Hello it is verify payemnt data')
+	const VerifyResult=await ordermodel.verifyPayment(req.body,res);
+	console.log(VerifyResult)
+	if(VerifyResult){
+		let razorpay_payment_id = req.body['payment[razorpay_payment_id]'];
+      let razorpay_order_id = req.body['payment[razorpay_order_id]'];
+      let razorpay_signature = req.body['payment[razorpay_signature]'];
+      let paymentDetails = { razorpay_payment_id, razorpay_order_id, razorpay_signature };
+      const changePaymentResult = await ordermodel.changePaymentStatus(
+        req.body['order[receipt]'],
+        paymentDetails,
+      );
+	//   console.log("⚠️",razorpay_payment_id,razorpay_order_id, razorpay_signature, paymentDetails, changePaymentResult);
+	  if(changePaymentResult){
+		return res.json({success:true,message:'payment result updated'});
+	  }else
+	  {
+		return res.json({
+			success:false,
+			message:'something gone wrong!payment result not updated',
+		});
+
+		}
+	  
+	}
+}
 
 
 const AddAddress = async (req, res) => {
@@ -164,8 +204,7 @@ res.json({ message: 'order canceled successfully', success: true });
 
 
 const changeOrderStatus=async (req,res)=>{
-	const {id}=req.body;
-	const { orderId,status }=id;
+	const { orderId,status }=req.body;
 	const result =await ordermodel.changeOrderStatus(status,orderId);
 	if(result.status){
 		return res.json({ success: true, message: result.message });
@@ -174,8 +213,111 @@ const changeOrderStatus=async (req,res)=>{
     }
 	}
 
+// function changeOrderStatus(orderId, status) {
+//     fetch('/admin/order-status', {
+//         method: 'post',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             orderId: orderId,
+//             status: status
+//         })
+//     }).then(async (res) => {
+//         if (res.ok) {
+//             // If the response is successful, parse the JSON
+//             const data = await res.json();
+//             console.log(data);
+//             // Handle the data as needed (reload the page, show a message, etc.)
+//             location.reload();
+//         } else {
+//             // If the response is not successful (HTTP error), handle the HTML error
+//             console.log(`HTTP error! Status: ${res.status}`);
+//             // You may want to display an error message to the user or handle the error in some way
+//         }
+//     }).catch(err => {
+//         console.log(err);
+//         // Handle other errors, such as network issues
+//     });
+// }
 
 
+
+const returnOrder= async(req,res)=>{
+	try{
+		const {id ,returnReason}=req.body;
+		const cancelResult= await ordermodel.returnOrder(id,returnReason);
+		if(cancelResult){
+			res.json({message:'order return succesfully',success:true});
+		}
+		else{
+			res.json({message:'something went wrong! return operation failed'});
+		}
+	}catch(error){
+		handleError(res,error);
+	}
+}
+
+
+
+const GetWallet=async(req,res)=>{
+	try{
+		const walletAmount= await ordermodel.getwallet(req.session.user._id);
+		if(walletAmount.status){
+			return res.render('user/wallet',{
+				walletAmount:walletAmount.amount,
+				walletPending:walletAmount.pendingWallet,
+			});
+		}else{
+			return res.render('user/wallet',{
+				walletAmount:walletAmount.amount,
+				walletPending:walletAmount.pendingWallet,
+			});
+		}
+	}catch(error){
+		handleError(res,error);
+	}
+}
+
+
+const ApplyWallet=async (req,res)=>{
+try {
+	const walletAmount=req.body.walletInput;
+	const userId=req.session.user._id;
+	const result=await cartmodel.cartProductTotal(userId);
+	const response=await ordermodel.getUserData(userId);
+	if(!result.status){
+		return res.status(404).json({success:false,message:'something wrong! cart is not found'});
+	}
+	let cart=result.cart;
+	let totalWallet=response.amount;
+	let cartTotal=cart.total;
+	let maxAmount;
+
+	if(req.session.coupon){
+		let coupon =req.session.coupon;
+		const discountAmount=(coupon.discount/100)* cartTotal;
+		cartTotal=cartTotal-discountAmount;
+	}
+
+	if(totalWallet>cartTotal){
+		maxAmount=cartTotal;
+	}else{
+		maxAmount=totalWallet;
+	}
+
+	if(maxAmount<walletAmount){
+		return res.status(400).json({success:false,message:'oops!wrong wallet amount'});	
+	}
+
+	cartTotal=cartTotal-walletAmount;
+	let walletBalance=totalWallet-walletAmount;
+	req.session.appliedWallet=walletAmount;
+
+	return res.json({success:true,cartTotal,walletBalance});	
+} catch (error) {	
+}
+}
 
 
 
@@ -191,6 +333,10 @@ module.exports = {
 	SuccessPage,
 	getOrderDetails,
 	DeleteAddress,
-	CancelOrder,changeOrderStatus
-	
+	CancelOrder,
+	changeOrderStatus,
+	returnOrder,
+	GetWallet,
+	ApplyWallet,
+	VerifyPayment
 }

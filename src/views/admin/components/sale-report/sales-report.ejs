@@ -1,0 +1,42 @@
+<div class="card-body">
+    <div >
+        <div class="table-responsive">
+            <table class="user-table list-table table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Order Id</th>
+                        <th>Buyer</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Payment Method</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders.forEach(order => { %>
+                        <% order.products.forEach(product => { %>
+                            <tr>
+                                <td><%= order.createdAt.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) %></td>
+                                <td><%= order._id %></td>
+                                <td><%= order.user.name %></td>
+                                <td><%= product.product ? product.product.title : 'N/A' %></td>
+                                <td><%= product.product ? product.product.category : 'N/A' %></td>
+                                <td><%= order.status%></td>
+                                <td><%= product.quantity %></td>
+                                <td><%= product.total %></td>
+                                <td><%= order.paymentMethod %></td>
+                              
+                            </tr>
+                        <% }); %>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+</div>
