@@ -1,4 +1,5 @@
 const productDatabase = require("../schema/product.schema");
+const orderDatabase=require("../schema/order.schema");
 const cloudinary = require("../config/cloudinary");
 const { Error } = require("mongoose");
 
@@ -206,6 +207,35 @@ async  searchProductsWithRegex(searchRegex) {
 	  throw new Error(`Error while searching products`);
 	}
   }
+
+
+
+  async updateProductStocks(orderId,changeStatus){
+	try {
+		const order = await orderDatabase.findById(orderId).populate('items.product');
+		if (!order) {
+		  throw new Error('Order not found');
+		}
+	
+		if (changeStatus === 'returned' || changeStatus === 'canceled') {
+		  for (const item of order.items) {
+			const productId = item.product._id;
+			const returnedQuantity = item.quantity;
+			const product = await productDatabase.findById(productId);
+	
+			if (!product) {
+			  throw new Error('Product not found');
+			}
+			product.stocks += returnedQuantity;
+			await product.save();
+	
+		  }
+		}
+	  } catch (error) {
+		throw new Error(`Failed to update product stocks: ${error.message}`);
+	  }
+	}
+
 
 
 

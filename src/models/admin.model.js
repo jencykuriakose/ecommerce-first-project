@@ -101,6 +101,12 @@ async graphData(){
 
       productsData[index] = product.count;
     }
+    console.log("Start of productData");
+    console.log(productsData)
+    console.log("End of productData");
+    console.log(salesData)
+    console.log("End of salesData");
+
 
     return {
       status: true,

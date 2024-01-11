@@ -187,13 +187,20 @@
 
   // Function to resend OTP (you can implement your resend logic here)
 
-  function sendOTP() {
+ async function sendOTP() {
 
     // Implement your OTP resend logic here
 
     // Start the timer again after resending OTP
-
-    startOTPTimer();
+    const response = await fetch('/resentOtp',{
+      method:'GET'
+    })
+    if(response.status === 200) {
+      alert('Otp Send Sucessfully')
+      startOTPTimer();
+    } else {
+      alert('Sorry for your inconvienience')
+    }
   }
 
   // Call the startOTPTimer function when the page loads

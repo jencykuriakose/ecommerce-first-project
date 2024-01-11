@@ -35,7 +35,7 @@
                             <td>
                                 <h5 class="product-name"><a href="/product/<%= item.product.slug %>">
                                         <%= item.product.productName %>
-                                    </a></h5> <span qty-navbar-<%=item.product._id %>" class="product-qty">x <%=
+                                    </a></h5> < qty-navbar-<%=item.product._id %>" class="product-qty">x <%=
                                         item.quantity %> </span>
                             </td>
 
@@ -55,14 +55,16 @@
                                 <td class="product-subtotal" colspan="2">₹<%= (cart?.total|| 0) %>
                                 </td>
                             </tr>
-                            <!-- <%#if ( locals.walletAmount) { %>
+                            
+                            <!-- <#%if ( locals.walletAmount) { %>
                                 <tr style="background-color: rgba(170, 239, 255, 0.187);">
                                     <th><a onclick="applyWalletAmount('<%#= cart?._id %>')"
                                             style="color: rgb(0, 90, 60);" id="applyWallet"> Apply wallet amount</a>
                                     </th>
                                     <td colspan="2"><em id="walletAmount">₹<%#= locals.walletAmount %></em></td>
                                 </tr>
-                                <%# } %> -->
+                                <#% } %> -->
+                            
 
                             <tr>
                                 <th>Discount</th>
@@ -88,7 +90,7 @@
                             </tr>
                             <tr>
                                 <th>Total</th>
-                                <td colspan="2" class="product-subtotal">₹<span class="font-xl text-brand fw-900"
+                                <td colspan="2" class="product-subtotal">₹<span class="font-xl text-brand fw-900 
                                         id="totalAmountSpn">
                                         <% if (locals.appliedWallet && locals.couponDiscount ) { %>
                                             <%= Math.floor(cart?.total - couponDiscount - appliedWallet) %>
@@ -153,24 +155,29 @@
                                 <p class="h1 fw-bold d-flex">
                                     <span>&#8377;</span>
                                     <span id="walletBalance">
+                                      <% if (appliedWallet) { %>
+                                            <%= locals.walletAmount - appliedWallet %>
+                                            <% } else { %>
+                                            <%= locals.walletAmount %>
+                                            <% } %>
                                         <!-- console.log(ejs) -->
                                     </span>
                                 </p>
-                                <!-- < if (walletAmount> cart.total) { %>
+                                 <% if (walletAmount> cart.total) { %>
                                     <div id="maxWallet" class="mt-1 mb-1">
                                         <p style="color: black;" id="message">you can apply total &#8377;<span
                                                 class="fw-600">
                                                 < cart.total %>
                                             </span> from your wallet!</p>
                                     </div>
-                                    < } else { %>
+                                    <% } else { %>
                                         <div id="maxWallet" class="mt-1 mb-1">
                                             <p style="color: black;" id="message">you can apply total &#8377;<span
                                                     class="fw-600">
-                                                    < walletAmount %>
+                                                    <%= walletAmount %>
                                                 </span> from your wallet!</p>
                                         </div>
-                                        < } %> -->
+                                        <% } %>
                                         <p style="color: black;" id="message">you can apply total &#8377;<span
 
                                             <p style="color: black;" id="message">you can apply total &#8377;<span
@@ -180,9 +187,9 @@
                                 <form id="walletForm">
                                     <span id="error-msg2"></span>
                                     <div class="form-group">
-                                        <input type="number" value="" id="wallet-input" min="0"
+                                        <input type="number" value="<%= appliedWallet %>" id="wallet-input" min="0"
                                             class="no-arrow"
-                                            placeholder="">
+                                            placeholder="<%= walletAmount>cart.total?cart.total: walletAmount %>">
                                     </div>
                                     <div class="form-group">
                                         <button class="btn btn-md" type="submit" id="apply-wallet" name="wallet">Apply
@@ -234,6 +241,8 @@
 
 <!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
 
 <script>
 
@@ -345,17 +354,17 @@
         walletForm.addEventListener('submit', (event) => {
             event.preventDefault();
             let cartAmount = '<%= cart.total %>'
-            let walletAmount = ''
+            let walletAmount = '<%= walletAmount %>'
             let msg = document.getElementById('message')
 
             let maxAmount;
 
-            // if (Math.floor(walletAmount) > cartAmount) {
-            //     maxAmount = cartAmount;
-            // } else {
-            //     maxAmount = walletAmount;
-            // }
-            // let walletInput = + document.getElementById('wallet-input').value;
+            if (Math.floor(walletAmount) > cartAmount) {
+                maxAmount = cartAmount;
+            } else {
+                maxAmount = walletAmount;
+            }
+            let walletInput = + document.getElementById('wallet-input').value;
 
             if (walletInput > maxAmount) {
                 msg.style.color = 'red'

@@ -69,6 +69,13 @@ const postSendOtp = async (req, res) => {
 	res.send(true);
 };
 
+const resentOtp = async (req,res,next) => {
+	let code = 200
+	const isSended = await utils.sendOtp(req.session.phone)
+	if(!isSended) code = 400
+	res.status(code).json({status:true})
+}
+
 // normal login
 
 const postloginverify = async (req, res) => {
@@ -244,6 +251,7 @@ module.exports = {
 	getLogin,
 	postSignup,
 	postSendOtp,
+	resentOtp,
 	getSignupLoginOtp,
 	postOtpVerify,
 	otpLoginOtpVerify,
@@ -255,6 +263,7 @@ module.exports = {
 	GenerateUniquePassword,
 	ResetPassword,
 	getInvoice,
+
 	// get404
 	
 };

@@ -151,11 +151,10 @@ async RemoveItemFromCart(userId,productId){
    
       const cart = await cartDatabase.findOne({ user: userId });
       if (cart && cart.total > 0) {
-        return {status:true,cart};
+        return {status: true, cart};
       } else {
-        return {status:false};
+        return {status: false};
       }
-   
     }
 
     async updateCartDetails(quantity,productId,userId){

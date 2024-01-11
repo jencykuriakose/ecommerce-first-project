@@ -12,6 +12,8 @@ const { IsLoggedIn, IsLoggedOut } = require("../middleware/auth.middleware");
 
 const { LoadProductDetails } = require("../controllers/product.controller");
 
+const couponController=require("../controllers/coupon.controller");
+
 const upload = require("../config/multer");
 
 const userRouter = express.Router();
@@ -21,8 +23,11 @@ const userRouter = express.Router();
 
 
 
+            // home
 
 userRouter.route("/").get(userController.getHome);
+
+           // signup
 
 userRouter.route("/signup").get(userController.getSignup).post(userController.postSignup);
 
@@ -31,6 +36,8 @@ userRouter.route("/signup-otp").post(userController.postSendOtp);
 userRouter.route("/otp-login").get(userController.getSignupLoginOtp).post(userController.postSendOtp);
 
 userRouter.route("/otp-verify").get(userController.otpLoginOtpVerify).post(userController.postOtpVerify);
+
+userRouter.route('/resentOtp').get(userController.resentOtp)
 
 userRouter.route("/login").get(userController.getLogin);
 
@@ -95,11 +102,16 @@ userRouter.route('/invoice').get(userController.getInvoice);
 
  userRouter.route('/wishlist').delete(IsLoggedIn,cartController.RemoveFromWishlist);
 
-//  userRouter.route('/apply-coupon').get(IsLoggedIn,)
-
  userRouter.route('/search-result').get(productController.ProductBySearch);
 
  userRouter.route('/')
+
+                           //  coupon
+
+userRouter.route('/apply-coupon').post(couponController.ApplyCoupon);
+
+userRouter.route('/remove-coupon').put(couponController.RemoveCoupon);
+
 
 
 

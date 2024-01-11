@@ -14,6 +14,8 @@ const upload = require("../config/multer");
 
 const { get404 } = require("../controllers/user.controller");
 
+const couponController=require("../controllers/coupon.controller");
+
 adminRouter.route("/");
 
 adminRouter.route("/login").get(adminController.getadminlogin).post(adminController.PostLogin);
@@ -61,10 +63,17 @@ adminRouter.route('/sales-report/download-excel').get(IsAdminLoggedIn,adminContr
 
 adminRouter.route("/graph").get(IsAdminLoggedIn,adminController.getGraphData);
 
-  adminRouter.route("/chart").get(IsAdminLoggedIn,adminController.ChartData);
+  adminRouter.route("/chart").get(IsAdminLoggedIn,adminController.getChartData);
 
 // adminRouter.route('*').get(adminController.get404);
 
+                //    coupon management 
+
+adminRouter.route("/coupons").get(IsAdminLoggedIn,couponController.GetCoupon);
+
+adminRouter.route("/coupons").post(IsAdminLoggedIn,couponController.AddCoupon);
+
+adminRouter.route("/coupon-status").put(IsAdminLoggedIn,couponController.ChangeCouponStatus);
 
 
 module.exports = adminRouter;

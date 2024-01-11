@@ -4,8 +4,11 @@ const cartDatabase = require("../schema/cart.schema");
 const productDatabase = require("../schema/product.schema");
 const userDatabase = require("../schema/user.schema");
 const { addressSchema } = require("../config/joi");
+const productModel=require("../models/product.model");
 const crypto = require("crypto");
 const moment = require("moment");
+
+const productmodel=new productModel();
 
 class orderModel {
 	constructor() {}
@@ -351,6 +354,7 @@ class orderModel {
 	}
 
 	async changeOrderStatus(changeStatus, orderId) {
+	
 		if (!["shipped", "delivered", "canceled", "returned"].includes(changeStatus)) {
 			throw new Error("Invalid status");
 		}
@@ -362,7 +366,9 @@ class orderModel {
 		if (changeStatus === 'returned' || changeStatus === 'canceled' && orderResult.paymentmethod !== 'cashOnDelivery') {
 			const orderResult = await orderDatabase.findById(orderId).select('total user');
 			const { total, user } = orderResult;
+			console.log(orderResult);
 			const userResult = await userDatabase.findById(user).select('wallet');
+			console.log(userResult);
 			const wallet = userResult.wallet;
 			const updatedWallet = wallet + total;
 			await userDatabase.findByIdAndUpdate(user, {
@@ -372,7 +378,7 @@ class orderModel {
 			});
 		  }
 		  if(changeStatus === 'returned' || changeStatus  === 'canceled'){
-			await updateProductStocks(orderId, changeStatus);
+			await productmodel.updateProductStocks(orderId, changeStatus);
 		  }
 		if (orderResult) {
 			return { status: true, message: "order updated" };
@@ -380,6 +386,13 @@ class orderModel {
 			return { status: false, message: "something goes wrong updation failed" };
 		}
 	}
+
+
+
+
+
+
+
 
 	async returnOrder(orderId, returnReason) {
 		try {
@@ -398,6 +411,8 @@ class orderModel {
 		}
 	}
 
+
+
 	async getwallet(userId) {
 		try {
 			const amount = await userDatabase.findById(userId).select("wallet");
@@ -411,7 +426,7 @@ class orderModel {
 			let pendingAmount = 0;
 
 			for (let order of pendingOrders) {
-				await new Promise((resolve) => setTimeout(resolve, 0));
+				//  await new Promise((resolve) => setTimeout(resolve, 0));
 				pendingAmount += order.total;
 			}
 			if (amount) {
@@ -424,6 +439,12 @@ class orderModel {
 			throw new Error("Oops!something went wrong while fetching wallet");
 		}
 	}
+
+
+	
+	  
+
+
 	async getUserData(userId) {
 		try {
 			const amount = await userDatabase.findById(userId).select("wallet");
@@ -452,6 +473,23 @@ class orderModel {
 			throw new Error("Error in changing payment status")
 		}
 	}
+
+
+
+// async getAllCoupons(){
+// 	try {
+// 		const currentDate = new Date();
+// 		const result = await couponDatabase.find({ validUntil: { $gte: currentDate } }).sort({ validFrom: 1 });
+// 		return result;
+// 	  } catch (error) {
+// 		throw new Error('oops!something wrong while fetching coupons');
+// 	  }
+// }
+
+
+
+
+
 }
 
 module.exports = orderModel;

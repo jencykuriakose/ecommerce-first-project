@@ -131,6 +131,7 @@ const getReport=async(req,res)=>{
 const getGraphData=async (req,res)=>{
 	try {
 		const result = await adminmodel.graphData();
+		console.log(result);
 		if (result.status) {
 		  res.json({
 			labels: result.labels,
@@ -150,14 +151,17 @@ const getGraphData=async (req,res)=>{
 
 
 
-const ChartData=async (req,res)=>{
+const getChartData=async (req,res)=>{
 	try{
 const result=await adminmodel.ChartData();
 if(result.status){
-	const {popularProducts}=result;
+	// const {popularProducts}=result;
 	const labels = popularProducts.map((product) => product.productName);
       const data = popularProducts.map((product) => product.totalOrders);
       const stocks = popularProducts.map((product) => product.stocks); // Fetch product stock data
+
+	  console.log(labels,data,stocks);
+
 
 
 	  return res.json({
@@ -236,7 +240,7 @@ module.exports = {
     getReport,
 	getGraphData,
 	DisplayReport,
-	ChartData,
+	getChartData,
 	GetReportExcel
 	// get404
 	

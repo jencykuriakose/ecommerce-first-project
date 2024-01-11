@@ -2,11 +2,14 @@ const productDatabase = require("../schema/product.schema");
 // const cartModel = require('../models/cart.model');
 const cartModel = require("../models/cart.model");
 const orderModel = require("../models/order.model");
+const couponModel=require("../models/coupon.model");
 const Razorpay=require("../config/rayzorpay");
 const { handleError } = require("../middleware/error-handler.middleware");
+const { LogInstance } = require("twilio/lib/rest/serverless/v1/service/environment/log");
 
 const ordermodel = new orderModel();
 const cartmodel = new cartModel();
+const couponmodel=new couponModel();
 
 
 // admin view the order page
@@ -41,6 +44,7 @@ const getorderpage = async (req, res) => {
 
 const GetCheckOut = async (req, res) => {
 	const cartResult = await cartmodel.cartProductTotal(req.session.user._id);
+	const coupons=await couponmodel.getAllCoupons();
 	if (cartResult.cart) {
 		cartResult.cart.items.forEach(async (item) => {
 			const product = await productDatabase.find({ _id: item.product });
@@ -49,19 +53,39 @@ const GetCheckOut = async (req, res) => {
 			}
 		});
 		const result = await ordermodel.getAddress(req.session.user._id, res);
-	
+	const userWallet=await ordermodel.getUserData(req.session.user._id);
 		if (cartResult.status) {
 			if (result.status) {
+				 let discountAmount;
+				 let couponcode;
+				 if(req.session.coupon){
+					const coupon=req.session.coupon;
+					couponcode=coupon.code;
+					discountAmount=(coupon.discount/100)*cartResult.cart.total;
+				 }else{
+					discountAmount=0;
+					couponcode=null;
+				 }
+				let appliedWallet;
+				if(req.session.appliedWallet){
+					appliedWallet=req.session.appliedWallet
+				}
 				
 
 				return res.render("user/checkout", {
-					addresses: result.addresses
+					addresses: result.addresses,
+					walletAmount:userWallet.amount,
+					coupons:coupons,
+					couponDiscount:discountAmount,
+					couponcode:couponcode,
+					appliedWallet:appliedWallet
 					
 				});
 			} else {
 				return res.render("user/checkout", {
-					addresses: []
-					
+					addresses: [],
+					walletAmount:userWallet.amount,
+					coupons:[],
 				});
 			}
 		} else {
@@ -155,6 +179,15 @@ const AddAddress = async (req, res) => {
 const SuccessPage = async (req, res) => {
 	const id = req.params.id;
 	await ordermodel.setSuccessStatus(id);
+
+	if(req.session.coupon){
+		await addCouponData(req.session.coupon,req.session.user._id);
+		delete req.session.coupon;
+	}
+	if (req.session.appliedWallet) {
+		await updateWalletData(req.session.appliedWallet, req.session.user._id, id);
+		delete req.session.appliedWallet;
+	  }
 
 	res.render("user/success-page");
 };
@@ -316,11 +349,9 @@ try {
 
 	return res.json({success:true,cartTotal,walletBalance});	
 } catch (error) {	
+	handleError(res,error);
 }
 }
-
-
-
 
 
 

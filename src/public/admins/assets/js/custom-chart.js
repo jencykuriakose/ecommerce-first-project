@@ -46,7 +46,6 @@
     method: 'GET',
     success: function (data) {
       if (data.success) {
-
         console.log(data);
         //graph one
         chart.data.labels = data.labels;

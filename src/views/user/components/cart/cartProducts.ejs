@@ -29,8 +29,6 @@
                 data-quantity="<%= item.quantity %>">
                 <%= item.quantity %>
             </span>
-            
-
               <a class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
             </div>
           </td>
@@ -65,17 +63,39 @@
 </div>
 
 <script>
+function incrementQty(productId){
+  let quantityElement=document.getElementById('qty-'+productId)
+  let  currentQty = parseInt(quantityElement.getAttribute('data-quantity'));
+  let  stockQuantity = parseInt(quantityElement.parentElement.getAttribute('data-stockqty'));
+  if(currentQty<stockQuantity){
+    currentQty++;
+    quantityElement.innerText=currentQty;
+  }
+  updateButtons(productId,currentQty,stockQuantity);
+}
+function decrementQty(productId){
 
+}
 // 
 
 function updateQuantity(productId, change) {
     var stockQty = parseInt(document.querySelector('.detail-qty[data-productid="' + productId + '"]').getAttribute('data-stockqty'));
     var currentQty = parseInt(document.getElementById('qty-' + productId).getAttribute('data-quantity'));
 
+
     if (currentQty + change >= 0 && currentQty + change <= stockQty) {
       // Update the quantity
       document.getElementById('qty-' + productId).setAttribute('data-quantity', currentQty + change);
       document.getElementById('qty-' + productId).innerText = currentQty + change;
+    }
+  }
+
+  function updateButtons(productId,currentQty,stockQty){
+    let qtyUpButton=document.querySelector('.qty-up');
+    if(currentQty===stockQty){
+      qtyUpButton.setAttribute('disabled',true);
+    }else{
+      qtyUpButton.removeAttribute('disabled');
     }
   }
 // 
