@@ -84,8 +84,8 @@
                                                         <a aria-label="Quick view" class="action-btn hover-up"
                                                             data-bs-toggle="modal" data-bs-target="#quickViewModal">
                                                             <i class="fi-rs-search"></i></a>
-                                                        <a aria-label="Add To Wishlist" class="action-btn hover-up"
-                                                            href="/wishlist/<%= product._id %>"><i
+                                                            <a aria-label="Add To Wishlist" class="action-btn hover-up addToWishlistButton"
+                                                            onclick="addToWishlist('<%= product._id %>')"><i
                                                                 class="fi-rs-heart"></i></a>
                                                         <a aria-label="Compare" class="action-btn hover-up" href="/"><i
                                                                 class="fi-rs-shuffle"></i></a>
@@ -202,4 +202,43 @@
         });
     }
 </script> 
+<!-- Add this script block at the end of your body tag -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.7/dist/sweetalert2.min.js"></script>
+
+    <script>
+        function addToWishlist(productId) {
+            const userConfirmation = Swal.fire({
+            title: 'Add to Wishlist?',
+            text: 'Are you sure you want to add this product to your wishlist?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, add to wishlist',
+            cancelButtonText: 'Cancel',
+            })
+        if (userConfirmation) {
+            fetch('/wishlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId: productId }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Product added to wishlist:', data);
+            })
+            .catch(error => {
+                console.error('Error adding product to wishlist:', error);
+            });
+        } else {
+            // User canceled, do nothing or provide feedback
+        }
+    }
+</script>
+
 </html>

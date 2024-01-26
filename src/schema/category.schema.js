@@ -6,6 +6,9 @@ const catergorySchema = new mongoose.Schema({
 		required: true,
 		unique: true
 	},
+	discount:{
+		type : Number 
+	},
 	active: {
 		type: Boolean,
 		required: true

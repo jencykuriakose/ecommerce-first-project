@@ -85,14 +85,61 @@ const GetCategories = async (req, res) => {
 };
 
 const postCategories = async (req, res) => {
-	const { name } = req.body;
-	const response = await categoryModel.addCategory(name);
+	const { name, discount } = req.body;
+	console.log("🥰",name, discount);
+	const response = await categoryModel.addCategory(name, discount);
 	if (response.status) {
 		res.json({ status: true, message: response.message });
 	} else {
 		res.json({ status: false, message: response.message });
 	}
 };
+
+                                // category discount 
+
+// const addnewProduct = async (req, res) => {
+// 	try {
+// 	  const { discountPercentage, price, category } = req.body;
+// 	  let offerPrice = 0;
+// 	  let discountAmount = 0;
+  
+// 	  const filteredCategory = await categoryModel.findById(category);
+  
+// 	  if (filteredCategory.offer > 0 && filteredCategory.offer > discountPercentage) {
+// 		offerPrice = (price * filteredCategory.offer) / 100;
+// 		discountAmount = price - offerPrice;
+// 	  } else {
+// 		offerPrice = (price * discountPercentage) / 100;
+// 		discountAmount = price - offerPrice;
+// 	  }
+  
+// 	  const product = new productModel({
+// 		// ... other product properties
+// 		discountPrice: discountAmount,
+// 		category: category,
+// 	  });
+  
+// 	  // ... rest of the product creation logic
+  
+// 	  await product.save();
+  
+// 	  req.session.successmessage = 'Product added successfully';
+// 	  res.redirect('/admin/products');
+// 	} catch (error) {
+// 	  console.error(error.message);
+// 	  const allCategory = await categoryModel.find({ active: true });
+// 	  res.render('addnewProduct', { errorMessage: 'Internal Server Error', allCategory });
+// 	}
+//   };
+  
+
+
+
+
+
+
+
+
 
 const putCategory = async (req, res) => {
 	const { id, status } = req.body;
@@ -151,37 +198,36 @@ const getGraphData=async (req,res)=>{
 
 
 
-const getChartData=async (req,res)=>{
-	try{
-const result=await adminmodel.ChartData();
-if(result.status){
-	// const {popularProducts}=result;
-	const labels = popularProducts.map((product) => product.productName);
-      const data = popularProducts.map((product) => product.totalOrders);
-      const stocks = popularProducts.map((product) => product.stocks); // Fetch product stock data
-
-	  console.log(labels,data,stocks);
-
-
-
-	  return res.json({
-        success: true,
-        labels,
-        data,
-        stocks,
-      });
-	} else {
-		return res.json({
-		  success: false,
-		  message: 'Oops! Something went wrong. Chart data not found.',
-		});
-	  
+const fetchChartData=async (req,res)=>{
+	 try {
+		console.log(popularProducts,"popularProducts");
+		const result = await adminmodel.ChartData();
+		if (result.status) {
+		  const { popularProducts } = result;
+	
+		  // Populate the chart data
+		  const labels = popularProducts.map((product) => product.productName);
+		  const data = popularProducts.map((product) => product.totalOrders);
+		  const stocks = popularProducts.map((product) => product.stocks); // Fetch product stock data
+	
+		  return res.json({
+			success: true,
+			labels,
+			data,
+			stocks,
+		  });
+		} else {
+		  return res.json({
+			success: false,
+			message: 'Oops! Something went wrong. Chart data not found.',
+		  });
+		}
+	  } catch (error) {
+		handleError(res, error);
+	  }
 }
-	}catch(error){
-		console.error('error fetching chart data',error);
-		res.status(500).json({success:false,message:'Internal server error'});
-	}
-}
+
+
 
 const DisplayReport= async (req, res)=> {
 	try {
@@ -195,6 +241,7 @@ const DisplayReport= async (req, res)=> {
 		handleError(res,error)
 	}
   }
+
 
 const GetReportExcel=async(req,res)=>{
 	try {
@@ -219,9 +266,9 @@ const GetReportExcel=async(req,res)=>{
 
 
 
-//   const get404=async (req,res)=>{
-// 	res.status(404).render('user/404');
-// };
+   const get404=async (req,res)=>{
+	res.status(404).render('user/404');
+ };
 
 
 	
@@ -240,8 +287,9 @@ module.exports = {
     getReport,
 	getGraphData,
 	DisplayReport,
-	getChartData,
-	GetReportExcel
-	// get404
+	fetchChartData,
+	GetReportExcel,
+	 get404,
+	//  addnewProduct
 	
 };

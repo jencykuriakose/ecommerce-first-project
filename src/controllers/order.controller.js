@@ -99,8 +99,15 @@ const PostCheckOut = async (req, res) => {
 	const checkoutResult = await ordermodel.AddOrderDetails(addressId, paymentmethod, req.session.user._id, req, res);
 
 	let cartTotal = checkoutResult.cartResult.total;
+	if (req.session.coupon) {
+		let coupon = req.session.coupon;
+		const discountAmount = (coupon.discount / 100) * cartTotal;
+		cartTotal = cartTotal - discountAmount;
+	  }
 
-	
+	  if (req.session.appliedWallet) {
+		cartTotal = cartTotal - req.session.appliedWallet;
+	  }
 
 	if (cartTotal < 1) {
 		await orderStatus(checkoutResult.order._id);
@@ -131,6 +138,16 @@ const PostCheckOut = async (req, res) => {
 					order:razorPayOrder,
 				});
 			}
+else if(paymentmethod==='wallet'){
+	if (res.session.userId >=cartTotal) {
+		return res.json({
+			success: true,
+			paymethod: "wallet",
+			message: "order details added!",
+			orderId: checkoutResult.order._id
+		});
+}
+}
 	} else {
 		return res.json({ success: false, message: "something goes wrong" });
 	}
@@ -185,7 +202,7 @@ const SuccessPage = async (req, res) => {
 		delete req.session.coupon;
 	}
 	if (req.session.appliedWallet) {
-		await updateWalletData(req.session.appliedWallet, req.session.user._id, id);
+		await ordermodel.updatedWalletData(req.session.appliedWallet, req.session.user._id, id);
 		delete req.session.appliedWallet;
 	  }
 
@@ -355,6 +372,19 @@ try {
 
 
 
+const Failedpage=async(req,res)=>{
+	if(req.session.coupon){
+		delete req.session.coupon;
+	}
+	if(req.session.appliedWallet){
+		delete req.session.ApplyWallet
+	}
+	res.render('user/failed-page');
+}
+
+
+
+
 
 module.exports = {
 	getorderpage,
@@ -362,6 +392,7 @@ module.exports = {
 	PostCheckOut,
 	AddAddress,
 	SuccessPage,
+	Failedpage,
 	getOrderDetails,
 	DeleteAddress,
 	CancelOrder,

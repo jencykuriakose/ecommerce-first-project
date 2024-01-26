@@ -15,13 +15,14 @@ class CategoryModel {
 		}
 	}
 
-	async addCategory(name) {
+	async addCategory(name, discount) {
 		const isCategoryExist = await categoryDatabase.findOne({ name:{ $regex: new RegExp(`^${name}$`, 'i') } });
 		if (isCategoryExist) {
 			return { status: false, message: `Category name already exsist` };
 		}
 		const category = new categoryDatabase({
 			name: name,
+			discount: discount,
 			active: true
 		});
 		const result = await category.save();

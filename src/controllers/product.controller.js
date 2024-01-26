@@ -31,8 +31,7 @@ const GetAddproducts = async (req, res) => {
 };
 
 const PostAddProduct = async (req, res) => {
-	//const data = req.body;
-	// console.log(data);
+	   console.log("✅");
 	if(req.fileValidationError){
 return res.status(400).json({error:res.fileValidationError.message});
 	}
@@ -123,11 +122,7 @@ const getallproducts=async (req,res)=>{
 	const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const sortBy = req.query.sortBy;
-	console.log(sortBy)
-	console.log('Hello how are you')
     const allProductsResult = await productModel.GetAllproducts(page, limit, sortBy);
-	console.log(allProductsResult);
-	console.log("At the end of the product");
     res.render('user/all-products',
 	 {
       products: allProductsResult.products,
@@ -189,6 +184,7 @@ const GetProductImages = async (req, res) => {
 // 		handleError(res,error);
 // 	}
 // }
+
 
 const ProductBySearch = async (req, res) => {
     try {

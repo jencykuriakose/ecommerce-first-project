@@ -1,7 +1,9 @@
 const productDatabase = require("../schema/product.schema");
 const orderDatabase=require("../schema/order.schema");
+const categoryDatabase = require("../schema/category.schema")
 const cloudinary = require("../config/cloudinary");
 const { Error } = require("mongoose");
+const CategoryModel = require("./category.model");
 
 class ProductModel {
 	constructor() {}
@@ -68,8 +70,14 @@ class ProductModel {
 	}
 
 	async addNewProduct(dataBody, datafiles) {
-		const { productName, productDescription, productPrice, productOldPrice, stocks, productCategory } = dataBody;
+		const { productName, productDescription, productOldPrice, stocks, productCategory } = dataBody;
+		let {productPrice} = dataBody;
 		console.log(dataBody);
+		const category = await categoryDatabase.findById({_id:productCategory});
+		if(category.discount){
+			let discount = (productPrice * category.discount)/100;
+			productPrice = Math.floor(productPrice - discount);
+		}
 		const product = new productDatabase({
 			productName: productName,
 			productDescription: productDescription,

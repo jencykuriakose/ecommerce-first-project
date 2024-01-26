@@ -1,12 +1,13 @@
 const productSchema = require("../schema/product.schema");
 const CartModel = require("../models/cart.model");
+const { handleError } = require("../middleware/error-handler.middleware");
 
-const cartModel = new CartModel();
+const cartmodel = new CartModel();
 
 const GetCart = async (req, res) => {
 	if (req.session.user) {
 		const userId = req.session.user._id;
-		const cartResult = await cartModel.fetchCartProducts(userId);
+		const cartResult = await cartmodel.fetchCartProducts(userId);
 		console.log(userId);
 		console.log(cartResult);
 		if (cartResult.status) {
@@ -36,7 +37,7 @@ const PostToCart = async (req, res) => {
 		return res.status(400).json({ success: false, message: "Invalid quantity" });
 	}
 
-	const cartResult = await cartModel.addItemToCart(userId, productId, quantity);
+	const cartResult = await cartmodel.addItemToCart(userId, productId, quantity);
 	if (cartResult.status) {
 		res.status(200).json({ success: cartResult.status, message: cartResult.message, product: cartResult.productData });
 	} else {
@@ -50,7 +51,7 @@ const RemoveFromCart=async (req,res)=>{
 	if(!productId || typeof productId!=='string'){
 		return res.status(400).json({status:false,message:'invalid product id '});
 	}
-	const cartResult=await  cartModel.RemoveItemFromCart(userId,productId);
+	const cartResult=await  cartmodel.RemoveItemFromCart(userId,productId);
 	if(cartResult.status){
 		res.status(200).json({ status: cartResult.status, message: cartResult.message ,total:cartResult.total });
     } else {
@@ -61,7 +62,7 @@ const RemoveFromCart=async (req,res)=>{
 
 const ClearCart=async(req, res)=>{
 	
-	  const cartResult = await cartModel.ClearCartItems(req.session.user._id);
+	  const cartResult = await cartmodel.ClearCartItems(req.session.user._id);
 
 	  if (cartResult.status) {
 
@@ -80,7 +81,7 @@ const UpdateQuantity=async(req,res)=>{
 
 const {quantity,productId}=req.body;
 const userId=req.session.user._id;
-const cartResult = await cartModel.updateCartDetails(quantity, productId, userId);
+const cartResult = await cartmodel.updateCartDetails(quantity, productId, userId);
 
     if (cartResult.status) {
       return res.json({
@@ -95,19 +96,23 @@ const cartResult = await cartModel.updateCartDetails(quantity, productId, userId
 
 
   const getWishlist=async (req,res)=>{
+	// try{
 	const userId=req.session.user._id;
-	const wishlistresult= await cartModel.fetchCartProducts(userId);
+	const wishlistresult= await cartmodel.fetchWishlistProducts(userId);
 	if(wishlistresult.status){
-		const items=wishlistresult.wishlist.item.map((item)=>({
-			product:items.product,
+		const items = wishlistresult.wishlist.items.map((item) => ({
+			product:item.product,
 			quantity:item.quantity,
 			price:item.price,
 		}));
-		return res.render('user/wishlist',{items})	
+		return res.render('user/wishlist',{items} )	
 	}
-	return res.render('user/wishlist',{items:[]})
-  }
+	return res.render('user/wishlist',{items: [] })
 
+// }catch(error){
+// handleError(res,error)
+// }
+  }
 
 
 
@@ -119,7 +124,7 @@ const cartResult = await cartModel.updateCartDetails(quantity, productId, userId
 		  .status(400)
 		  .json({ success: false, message: 'Invalid product id' });
 	  }
-	  const wishlistItem = await cartModel.addItemToWishlist(userId, productId);
+	  const wishlistItem = await cartmodel.addItemToWishlist(userId, productId);
 	  if (wishlistItem.status) {
 		res
 		.status(200)
@@ -137,7 +142,7 @@ const RemoveFromWishlist=async(req,res)=>{
 	if(!productId || typeof productId !=='string'){
 		return res.status(400).json({status:false,message:'invalid product id' });
 	}
-	const wishlistResult= await cartModel.RemoveFromWishlist(userId,productId);
+	const wishlistResult= await cartmodel.RemoveItemFromWishlist(userId,productId);
 	if(wishlistResult.status){
 		res.status(200).json({status:wishlistResult.status,message:wishlistResult.message});
 	}
@@ -151,6 +156,8 @@ const RemoveFromWishlist=async(req,res)=>{
 
 
 
+
+
 module.exports = {
 	GetCart,
 	PostToCart,
@@ -159,5 +166,6 @@ module.exports = {
 	UpdateQuantity,
 	getWishlist,
 	postWishlist,
-	RemoveFromWishlist
+	RemoveFromWishlist,
+	
 };

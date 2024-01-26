@@ -205,8 +205,8 @@ const getlogout = (req, res) => {
 const getInvoice=async ( req , res )=>{
 	try{
 	const id=req.query.id;
-	const invoicedata= await ordermodel.OrderDetails(id);
-	generateInvoice(invoicedata,res);
+	const invoiceData= await ordermodel.OrderDetails(id);
+	generateInvoice(invoiceData, res);
 	}catch(error){
     handleError(res,error);
 	}
@@ -233,14 +233,9 @@ handleError(res,error);
 
 
 
-
-
-
-
-
-// const get404=async (req,res)=>{
-// 	res.status(404).render('user/404');
-// };
+ const get404=async (req,res)=>{
+ 	res.status(404).render('user/404');
+ };
 
 
 
@@ -263,7 +258,6 @@ module.exports = {
 	GenerateUniquePassword,
 	ResetPassword,
 	getInvoice,
-
-	// get404
+	 get404
 	
 };

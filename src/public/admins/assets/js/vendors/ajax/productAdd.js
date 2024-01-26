@@ -21,57 +21,67 @@ submitButton.addEventListener('click', (event) => {
   const productOldPrice = document.getElementById('productOldPrice').value;
   const stocks = document.getElementById('stocks').value;
   const productCategory = document.getElementById('productCategory').value;
+  
 
+
+
+  // document.addEventListener('DOMContentLoaded', function () {
+  //    const productNameInput = document.getElementById('productName');
+  //  const productNameMessage = document.getElementById('productNameValidationMessage');
+  //   productNameMessage.innerHTML = '';
+  //  productNameInput.addEventListener('input', () => {
+  //    productNameMessage.innerHTML = '';
+  //   });
+  // });
+  
   const productNameInput = document.getElementById('productName');
   const productNameMessage = document.getElementById('productNameValidationMessage');
-  productNameMessage.innerHTML = '';
+   productNameMessage.innerHTML = '';
   productNameInput.addEventListener('input', () => {
     productNameMessage.innerHTML = '';
   });
   
   const productDescriptionInput = document.getElementById('productDescription');
   const productDescriptionMessage = document.getElementById('productDescriptionValidationMessage')
-  productDescriptionMessage.innerHTML ='';
+   productDescriptionMessage.innerHTML ='';
   productDescriptionInput.addEventListener('input',()=>{
     productDescriptionMessage.innerHTML=''
   })
 
   const productPriceInput = document.getElementById('productPrice');
   const productPriceMessage = document.getElementById('productPriceValidationMessage')
-  productPriceMessage.innerHTML ='';
+   productPriceMessage.innerHTML ='';
   productPriceInput.addEventListener('input',()=>{
     productPriceMessage.innerHTML=''
   })
 
   const productOldPriceInput = document.getElementById('productOldPrice');
   const productOldPriceMessage = document.getElementById('productOldPriceValidationMessage')
-  productOldPriceMessage.innerHTML ='';
+   productOldPriceMessage.innerHTML ='';
   productOldPriceInput.addEventListener('input',()=>{
     productOldPriceMessage.innerHTML=''
   })
 
   const stocksInput = document.getElementById('stocks');
   const stocksMessage = document.getElementById('stocksValidationMessage')
-  stocksMessage.innerHTML ='';
+   stocksMessage.innerHTML ='';
   stocksInput.addEventListener('input',()=>{
     stocksMessage.innerHTML=''
   })
   
-  const productCategoryInput = document.getElementById('productCategory');
-  const productCategoryMessage = document.getElementById('productCategoryValidationMessage')
-  productCategoryMessage.innerHTML ='';
-  productCategoryInput.addEventListener('select',()=>{
-    productCategoryMessage.innerHTML=''
-  })
+  // const productCategoryInput = document.getElementById('productCategory');
+  // const productCategoryMessage = document.getElementById('productCategoryValidationMessage')
+  //  productCategoryMessage.innerHTML ='';
+  // productCategoryInput.addEventListener('select',()=>{
+  //   productCategoryMessage.innerHTML=''
+  // })
  
   const productImageInput = document.getElementById('productImage');
   const productImageMessage = document.getElementById('productImageValidationMessage')
-  productImageMessage.innerHTML ='';
+   productImageMessage.innerHTML ='';
   productImageInput.addEventListener('input',()=>{
     productImageMessage.innerHTML=''
   })
-
-
   if (
     !productName ||
     !productDescription ||

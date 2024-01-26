@@ -1,6 +1,7 @@
 
 const couponDatabase=require("../schema/coupon.schema");
-
+const userDatabase=require("../schema/user.schema");
+const cartDatabase=require("../schema/cart.schema")
 
 
 class couponModel{
@@ -19,9 +20,8 @@ throw new Error('oops!something wrong while fetching coupon');
     }
 
     async isUserValidForCoupon(userId,coupon){
-        try {
+        // try {
             const user = await userDatabase.findById(userId);
-        
             if (user.couponHistory.length > 0) {
               const usedCoupon = user.couponHistory.find(couponId => couponId.equals(coupon._id));
               if (usedCoupon) {
@@ -39,12 +39,12 @@ throw new Error('oops!something wrong while fetching coupon');
            
             let cartTotal = cart.total;
             return { status: true,cartTotal};
-          } catch (error) {
-            throw new Error('oops!something wrong while checking user is valid for coupon');
-          }
+          // } catch (error) {
+          //   throw new Error('oops!something wrong while checking user is valid for coupon');
+          // }
     }
 
-async findcoupon(couponName){
+    async findcoupon(couponName){
     try{
         const result = await couponDatabase.findOne({ code: couponName });
     if (result) {
@@ -83,7 +83,7 @@ async addCoupon(dataBody){
     const { couponname, couponDescription, discount, validFrom, validUntil, minimumPurchase } = dataBody;
     const randomThreeDigitNumber = Math.floor(100 + Math.random() * 900);
     const code = `${couponname.split(' ').join('')}${randomThreeDigitNumber}`.toUpperCase();
-     console.log(code,"✅");
+     
 
     const coupon = new couponDatabase({
       couponname: couponname,
@@ -107,7 +107,7 @@ async addCoupon(dataBody){
   //   throw new Error('oops!something wrong while adding coupon');
   // }
 }
-
+                                                                                    
 
 
 

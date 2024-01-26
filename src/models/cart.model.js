@@ -72,7 +72,7 @@ class cartModel {
 async fetchCartProducts(userId){
   console.log('request');
   
-    const cart=await cartDatabase.findOne({user:userId}).populate('items.product');
+    const cart= await cartDatabase.findOne({user:userId}).populate('items.product');
     if(!cart){
         return {status:false, cart ,total :0 };
     }
@@ -196,7 +196,6 @@ async fetchCartProducts(userId){
 async addItemToWishlist(userId,productId){
 
   const product = await productDatabase
- 
   .findById(productId)
   .select('productPrice productimageurl productName _id stocks');
 if (!product) {
@@ -205,6 +204,7 @@ if (!product) {
 }
 
 let wishlist = await wishlistDatabase.findOne({ user: userId });
+console.log(wishlist,"✅⚠️🧚‍♀️");
 let productAlreadyExist = false;
 if (wishlist) {
   const itemIndex = wishlist.items.findIndex((item) => item.product.equals(productId));
@@ -269,6 +269,18 @@ async RemoveItemFromWishlist(userId,productId){
   }
 
 
+  async fetchWishlistProducts(userId){
+    try {
+      const wishlist = await wishlistDatabase.findOne({ user: userId }).populate('items.product');
+      if (!wishlist) {
+        return { status: false, wishlist, total: 0 }
+      } else {
+        return { status: true, wishlist }
+      }
+    } catch (error) {
+      throw new Error('Something went wrong while fetching products to wishlist');
+    }
+  }
 
 
 

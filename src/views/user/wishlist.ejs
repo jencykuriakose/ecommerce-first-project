@@ -32,7 +32,7 @@
                   <tr data-item-id="<%= item.product._id %>">
                     <td class="image product-thumbnail"><img src="<%= item.product.productimageurl[0] %>" alt="#"></td>
                     <td class="product-des product-name">
-                      <h5 class="product-name"><a href="/product/<%= item.product.slug %>"><%= item.product.productName %>
+                      <h5 class="product-name"><a href="/product/<%= item.product._id %>"><%= item.product.productName %>
                         </a></h5>
                     </td>
                     <td class="price" data-title="Price"><span>&#8377;<%= item.product.productPrice %></span></td>
@@ -50,7 +50,9 @@
                         <button class="btn btn-sm notifyMe" data-product-id="<%= item.product._id %>"><i class="fi-rs-shopping-bag mr-5" ></i>Notify Me</button>
                       <% } %>
                       </td>
-                    <td class="action" onclick="removeProductWishlist('<%= item.product._id %>')"><a class="text-muted"><i class="fi-rs-trash"></i></a></td>
+                     <!-- <td class="action" onclick="removeProductWishlist('<#%= item.product._id %>')"><a class="text-muted"><i class="fi-rs-trash"></i></a></td> -->
+                     <td class="action" onclick="removeProductWishlist('<%= item.product._id %>')"><a class="text-muted"><i class="fi-rs-trash"></i></a></td>
+
                   </tr>
                   <% }) %>
                 </tbody>
@@ -68,3 +70,51 @@
 </body>
 
 </html>
+<!-- Script defining removeProductWishlist -->
+<!-- <script>
+  function removeProductWishlist(productId) {
+      // Your function logic goes here
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+      const wishlistButton = document.querySelector('.action');
+      wishlistButton.addEventListener('click', function () {
+           const productId = '<%#= item.product._id %>';
+          removeProductWishlist(productId);
+      });
+  });
+</script> -->
+
+<!-- Other scripts and HTML content -->
+<!-- <td class="action"><a class="text-muted"><i class="fi-rs-trash"></i></a></td> -->
+
+
+<!-- Script defining removeProductWishlist -->
+<script>
+  function removeProductWishlist(productId) {
+      // Your function logic goes here
+      console.log('Removing product with ID:', productId);
+
+      // Example: Make a fetch request to your server to remove the product from the wishlist
+
+      fetch('/wishlist/' + productId, {
+    method: 'DELETE',
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error('Failed to remove product from wishlist');
+    }
+    // Handle success
+    console.log('Product removed from wishlist successfully');
+})
+.catch(error => {
+    // Handle error
+    console.error('Error:', error);
+});
+
+  }
+</script>
+
+<!-- Other scripts and HTML content -->
+ <!-- <td class="action" onclick="removeProductWishlist('<#%= item.product._id %>')"><a class="text-muted"><i class="fi-rs-trash"></i></a></td> -->
+

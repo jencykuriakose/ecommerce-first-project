@@ -1,10 +1,17 @@
-<div class="col-lg-12">
+ <div class="col-lg-12">
     <div class="card mb-4">
         <article class="card-body">
             <h5 class="card-title">Sale statistics</h5>
             <canvas id="myChart" height="120px"></canvas>
         </article>
      </div>
+     
+     <!-- <div class="card mb-4"> 
+        <article class="card-body">
+            <h5 class="card-title">Product statistics</h5>
+            <canvas id="myChart" height="120px"></canvas>
+        </article>
+     </div> -->
     <!-- <div class="row">
         <div class="col-lg-5">
             <div class="card mb-4">
@@ -136,4 +143,169 @@
             </div>
         </div>
     </div> --> 
-</div>
+<!-- </div> -->
+
+<!-- Include Chart.js library -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Dummy data for testing, replace with your actual data
+        const labels = ["January", "February", "March", "April", "May"];
+        const data = [10, 20, 15, 25, 30];
+
+        // Get the canvas element
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        // Create the chart
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Orders',
+                    data: data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'category'
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>  -->
+
+
+ 
+ <!-- <div class="col-lg-12">
+    <div class="card mb-4">
+        <article class="card-body">
+            <h5 class="card-title">Sale statistics</h5>
+            <canvas id="saleChart" height="120px"></canvas>
+        </article>
+    </div>  -->
+
+
+
+
+
+
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <article class="card-body">
+                <h5 class="card-title">Sale statistics</h5>
+                <canvas id="saleChart" height="200px"></canvas> 
+                 <!-- <canvas id="saleChart" height="200px" width="400px"></canvas>  -->
+
+            </article>
+        </div>
+
+
+
+
+
+<!-- 
+    <div class="card mb-4">
+        <article class="card-body">
+            <h5 class="card-title">Product statistics</h5>
+            <canvas id="productChart" height="200px"></canvas>
+        </article>
+    </div>
+</div> -->
+
+<!-- Include Chart.js library -->
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+
+
+
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Dummy data for testing, replace with your actual data
+        const labels = ["January", "February", "March", "April", "May"];
+        const data = [ 5, 10, 20, 15, 25, 30];
+
+        // Get the canvas elements
+        const saleCtx = document.getElementById('saleChart').getContext('2d');
+        // const productCtx = document.getElementById('productChart').getContext('2d');
+
+        // Create the charts
+
+        const saleChart = new Chart(saleCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Orders',
+                    data: data,  
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    category: {
+                        type: 'category'
+                    },
+                    products: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // You can create another chart with different data using productCtx
+        // const productChart = new Chart(productCtx, { ... });
+    });
+</script> -->
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<body>
+
+<canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+
+<script>
+var xValues = ["product", "sales", "order", "category"];
+var yValues = [55, 49, 44, 24 ];
+var barColors = [
+  "#b91d47",
+  "#00aba9",
+  "#2b5797",
+  "#e8c3b9",
+  "#1e7145"
+];
+
+new Chart("saleChart", {
+  type: "doughnut",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      text: "SALES REPORT "
+    }
+  }
+});
+</script>
+
+

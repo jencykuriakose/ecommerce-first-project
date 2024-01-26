@@ -37,6 +37,13 @@ const couponSchema=new mongoose.Schema({
         type:Boolean,
         required:true, 
     },
+    couponHistory: {
+      type: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Coupon',
+      }],
+      default: [],
+    },
 });
     couponSchema.pre('save',function(next){
         const currentDate=new Date();

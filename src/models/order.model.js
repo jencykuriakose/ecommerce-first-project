@@ -44,7 +44,7 @@ class orderModel {
 	}
 
 	async AddOrderDetails(addressId, paymentMethod, userId, req, res) {
-		if (!["razorpay", "cashOnDelivery"].includes(paymentMethod)) {
+		if (!["razorpay", "cashOnDelivery"],["wallet"].includes(paymentMethod)) {
 			console.log("payment method:", paymentMethod);
 			throw new Error("Invalid payment method");
 		}
@@ -70,17 +70,17 @@ class orderModel {
 				total: cartResult.total
 			});
 
-			// if (req.session.coupon) {
-			//   let coupon = req.session.coupon;
-			//   const discountAmount = (coupon.discount / 100) * cartResult.total;
-			//   order.discount = discountAmount;
-			//   order.total = cartResult.total - discountAmount.toFixed(2);
-			// }
+			if (req.session.coupon) {
+			  let coupon = req.session.coupon;
+			  const discountAmount = (coupon.discount / 100) * cartResult.total;
+			  order.discount = discountAmount;
+			  order.total = cartResult.total - discountAmount.toFixed(2);
+			}
 
-			// if (req.session.appliedWallet) {
-			//   let appliedWallet = req.session.appliedWallet;
-			//   order.total = order.total - appliedWallet;
-			// }
+			if (req.session.appliedWallet) {
+			  let appliedWallet = req.session.appliedWallet;
+			  order.total = order.total - appliedWallet;
+			}
 
 			for (const item of cartResult.items) {
 				const quantity = item.quantity;
@@ -170,7 +170,7 @@ class orderModel {
 			.findById(orderId)
 			.populate({
 				path: "items.product",
-				select: "productName productPrice productimageurl",
+				select: "productName productPrice productimageurl id",
 				model: "Product"
 			})
 			.populate({
@@ -184,7 +184,7 @@ class orderModel {
 		orderData.subtotal = subtotal;
 
 		if (orderData) {
-			console.log(orderData);
+			console.log(orderData,"😊🤪");
 			return { status: true, orderData };
 		} else {
 			return { status: false };
@@ -474,7 +474,7 @@ class orderModel {
 		}
 	}
 
-
+	
 
 // async getAllCoupons(){
 // 	try {
@@ -485,6 +485,51 @@ class orderModel {
 // 		throw new Error('oops!something wrong while fetching coupons');
 // 	  }
 // }
+
+
+async updatedWalletData(walletAmount,userId,orderId){
+	try{
+const user=await userDatabase.findByIdAndUpdate(
+	userId,
+	{
+		$inc:{wallet:-walletAmount},
+	},
+	{new:true},
+);
+const result=await orderDatabase.findByIdAndUpdate(
+	orderId,
+	{
+		$set:{wallet:walletAmount},
+	},
+	{new:true},
+);
+return;
+
+	}catch(error){
+throw new Error("error update wallet data!");
+	}
+}
+
+
+
+async addCouponData(couponData,userId){
+	try{
+const user= await userDatabase.findById(userId)
+user.couponHistory.push(couponData._id);
+await user.save();
+return true;
+	}catch(error){
+throw new Error("oops!something wrong while adding coupon data")
+	}
+}
+
+
+
+
+
+
+
+
 
 
 

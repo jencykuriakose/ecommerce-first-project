@@ -59,7 +59,7 @@
                           <button class="button notify-me-btn">Notify Me</button> 
                           <button class="button notify-me-btn" disabled >Out of Stock</button>
                     <% } %>
-                    <a aria-label="Add To Wishlist" class="addToWishlistButton action-btn hover-up" id="addToWishlistButton" data-product-id="<%= product._id %>"><i class="fi-rs-heart"></i></a>
+                    <a aria-label="Add To Wishlist" class="action-btn hover-up addToWishlistButton" onclick="addToWishlist('<%= product._id %>')"><i class="fi-rs-heart"></i></a>
             </div> 
 
          </div>
@@ -73,6 +73,44 @@
                             </ul>
     </div>
     </div> 
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.7/dist/sweetalert2.min.js"></script>
+
+    <script>
+        function addToWishlist(productId) {
+            const userConfirmation = Swal.fire({
+            title: 'Add to Wishlist?',
+            text: 'Are you sure you want to add this product to your wishlist?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, add to wishlist',
+            cancelButtonText: 'Cancel',
+            })
+            if (userConfirmation) {
+                fetch('/wishlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ productId: productId }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Product added to wishlist:', data);
+                })
+                .catch(error => {
+                    console.error('Error adding product to wishlist:', error);
+                });
+            } else {
+                // User canceled, do nothing or provide feedback
+            }
+        }
+    </script>
     
 
 

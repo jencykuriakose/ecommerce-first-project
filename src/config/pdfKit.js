@@ -132,13 +132,15 @@ function generateInvoice(orderDetails, res) {
 
 function generateInvoiceHeader(doc) {
   doc
-    .image('public/user/assets/imgs/theme/redLogo.png', 50, 57, { width: 115, height:30 })
+    .font('Helvetica-Bold')
+    .text('THROTTLE', 50, 80, { align: 'left' })
     .fillColor('#444444')
     .fontSize(20)
     .fontSize(10)
     .text(' Bombay Mutual, D N Marg', 200, 65, { align: 'right' })
     .text('Fort , Mumbai, India', 200, 80, { align: 'right' })
     .moveDown();
+
 }
 function generateCustomerInformation(doc, invoice) {
   const shipping = invoice.orderData;

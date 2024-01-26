@@ -16,15 +16,19 @@ handleError(res,error);
 
 
 const ApplyCoupon=async(req,res)=>{
-try{
+ try{
+  const { couponName } = req.body;
     const coupon = await couponmodel.findcoupon(couponName);
     if (!coupon.status) {
       return res.json({ success: false, message: 'Invalid coupon' });
     }
-
-    const userId = req.session.user._id;
+    
+    if (coupon.coupon.expiryDate < new Date()) {
+      return res.json({ success: false, message: 'Coupon has expired' });
+    }
+    // const userId = req.session.userId;
+    const userId=req.session.user._id;
     const response = await couponmodel.isUserValidForCoupon(userId, coupon.coupon);
-
     if (response.status) {
 
       if (req.session.appliedWallet) {
@@ -39,9 +43,8 @@ try{
 
       const discountAmount = (coupon.coupon.discount / 100) * response.cartTotal;
       let cartTotal = response.cartTotal - discountAmount;
-
-     
-
+    
+       
       req.session.coupon = coupon.coupon;
 
 
@@ -52,6 +55,20 @@ try{
             success: false,
             message: `You can only add wallet amount ${wallet} while using coupon!`,
           });
+        }
+        const discountAmount=(coupon.coupon.discount/100)* response.cartTotal;
+        let cartTotal=response.cartTotal-discountAmount;
+
+        req.session.coupon=coupon.coupon;
+
+        if(req.session.appliedWallet){
+          if(cartTotal<req.session.appliedWallet){
+            const wallet=req.session.appliedWallet-cartTotal
+            return res.json({
+              success:false,
+              message:`You can only add wallet amount ${wallet} while using coupon!`,
+            });
+          }
         }
 
         cartTotal = cartTotal - req.session.appliedWallet;

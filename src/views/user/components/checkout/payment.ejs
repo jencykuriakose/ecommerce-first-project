@@ -7,6 +7,7 @@
 
     .no-arrow {
         -moz-appearance: textfield;
+        appearance: textfield;
     }
 </style>
 
@@ -32,12 +33,23 @@
                                     src="<%= item.product.productimageurl[0] %>">
                             </td>
 
-                            <td>
-                                <h5 class="product-name"><a href="/product/<%= item.product.slug %>">
-                                        <%= item.product.productName %>
-                                    </a></h5> < qty-navbar-<%=item.product._id %>" class="product-qty">x <%=
+                            <!-- <td>
+                                <h5 class="product-name"><a href="/product/<#%= item.product.slug %>">
+                                        <#%= item.product.productName %>
+                                    </a></h5>  qty-navbar-<#%=item.product._id %>" class="product-qty">x <#%=
                                         item.quantity %> </span>
+                            </td> -->
+
+                            <td>
+                                <h5 class="product-name">
+                                    <a href="/product/<%= item.product._id  %>">
+                                        <%= item.product.productName %>
+                                    </a>
+                                </h5>
+                                <span id="qty-navbar-<%= item.product._id %>" class="product-qty">x <%= item.quantity %></span>
                             </td>
+                            
+
 
                             <td class="price" data-title="Price" id="subtotal"
                                 data-price="<%= item.product.productPrice %>">₹<%= item.price %>
@@ -56,26 +68,26 @@
                                 </td>
                             </tr>
                             
-                            <!-- <#%if ( locals.walletAmount) { %>
+                            <%if ( locals.walletAmount) { %>
                                 <tr style="background-color: rgba(170, 239, 255, 0.187);">
-                                    <th><a onclick="applyWalletAmount('<%#= cart?._id %>')"
+                                    <th><a onclick="applyWalletAmount('<%= cart?._id %>')"
                                             style="color: rgb(0, 90, 60);" id="applyWallet"> Apply wallet amount</a>
                                     </th>
-                                    <td colspan="2"><em id="walletAmount">₹<%#= locals.walletAmount %></em></td>
+                                    <td colspan="2"><em id="walletAmount">₹<%= locals.walletAmount %></em></td>
                                 </tr>
-                                <#% } %> -->
+                                <% } %>
                             
 
-                            <tr>
-                                <th>Discount</th>
-                                <td class="product-discount" colspan="2">₹<span id="coupon-discount">
+                                <tr>
+                                    <th>Discount</th>
+                                    <td class="product-discount" colspan="2">₹<span id="coupon-discount">
                                         <% if (locals.couponDiscount) { %>
-                                            <%= Math.floor(locals.couponDiscount) %>
-                                                <% } else { %>0
-                                                    <% } %>
-                                    </span>
-                                </td>
-                            </tr>
+                                        <%= Math.floor(locals.couponDiscount) %>
+                                        <% } else { %>0
+                                        <% } %>
+                                      </span>
+                                    </td>
+                                  </tr>
                             <tr>
                                 <th>Applied Wallet Amount</th>
                                 <td class="product-wallet" colspan="2">₹<span id="wallet-discount">
@@ -90,7 +102,8 @@
                             </tr>
                             <tr>
                                 <th>Total</th>
-                                <td colspan="2" class="product-subtotal">₹<span class="font-xl text-brand fw-900 
+                                <td colspan="2" class="product-subtotal">₹
+                                    <span class="font-xl text-brand fw-900"
                                         id="totalAmountSpn">
                                         <% if (locals.appliedWallet && locals.couponDiscount ) { %>
                                             <%= Math.floor(cart?.total - couponDiscount - appliedWallet) %>
@@ -102,7 +115,8 @@
                                                                     <%= Math.floor((cart?.total || 0)) %>
                                                                         <% } %>
 
-                                    </span></td>
+                                    </span>
+                                </td>
                             </tr>
 
                 </tbody>
@@ -123,7 +137,7 @@
                 <div class="panel-collapse collapse coupon_form " id="coupon">
                     <div class="panel-body">
                         <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                        <form method="post">
+                        <form>
                             <span id="error-msg"></span>
                             <div class="form-group">
 
@@ -178,9 +192,7 @@
                                                 </span> from your wallet!</p>
                                         </div>
                                         <% } %>
-                                        <p style="color: black;" id="message">you can apply total &#8377;<span
-
-                                            <p style="color: black;" id="message">you can apply total &#8377;<span
+                                        <!-- <p style="color: black;" id="message">you can apply total &#8377;<span -->
 
                             </div>
                             <div class="col-md-4">
@@ -230,6 +242,12 @@
                     <label class="form-check-label" for="razorpay" data-bs-toggle="collapse" data-target="#razorpay"
                         aria-controls="razorpay">Razorpay</label>
                 </div>
+                <!-- <div class="custome-radio">
+                    <input class="form-check-input" required="" type="radio" name="payment_option" id="wallet"
+                        checked="">
+                    <label class="form-check-label" for="wallet" data-bs-toggle="collapse"
+                        data-target="#wallet" aria-controls="wallet">Wallet</label>
+                </div> -->
             </div>
         </div>
         <button type="submit" id="placeOrder" class="btn btn-fill-out btn-block mt-30">Place Order</button>
@@ -292,6 +310,7 @@
 
         applyButton.addEventListener('click', (event) => {
             event.preventDefault();
+            alert("coupon clicked")
             const couponName = document.getElementById('couponName').value;
             const url = '/apply-coupon';
             fetch(url, {
@@ -657,11 +676,9 @@
                 break;
             }
         }
-
         const obj = {
             paymentmethod: selectedPaymentOption, addressId: selectedAddress
         }
-
         fetch('/checkout', {
             method: 'POST',
             headers: {
@@ -678,6 +695,10 @@
                     window.location.href = `/order-successfull/${id}`;
                 } else if (response.paymethod === 'ONLINE') {
                     razorpayPayment(response.order)
+                }
+                else if(response.paymentmethod==='wallet'){
+                    const id = response.orderId
+                    window.location.href = `/order-successfull/${id}`;
                 }
             }
 

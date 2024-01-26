@@ -101,11 +101,11 @@ async graphData(){
 
       productsData[index] = product.count;
     }
-    console.log("Start of productData");
-    console.log(productsData)
-    console.log("End of productData");
-    console.log(salesData)
-    console.log("End of salesData");
+    // console.log("Start of productData");
+    // console.log(productsData)
+    // console.log("End of productData");
+    // console.log(salesData)
+    // console.log("End of salesData");
 
 
     return {
@@ -122,29 +122,30 @@ async graphData(){
 
 
 async ChartData(){
-  const popularProducts=await orderDatabase.aggregate([
+  console.log(popularProducts,"popularProducts");
+  const popularProducts = await orderDatabase.aggregate([
     {
-      $unwind:'$items'
+      $unwind: '$items',
     },
     {
-      $group:{
-        _id:'$items.product',
-        totalOrders:{$sum:1},
+      $group: {
+        _id: '$items.product',
+        totalOrders: { $sum: 1 },
       },
     },
     {
-      $lookup:{
-        from:'products',
-        localFeild:'_id',
-        forignFeild:'_id',
-        as:'product'
+      $lookup: {
+        from: 'products',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'product',
       },
     },
     {
-      $unwind:'$product',
+      $unwind: '$product',
     },
     {
-      $sort:{totalorders:-1 },
+      $sort: { totalOrders: -1 },
     },
     {
       $limit: 5,
@@ -158,7 +159,10 @@ async ChartData(){
       },
     },
   ]);
+
   return { status: true, popularProducts };
+} catch (error) {
+  throw new Error(`Error fetching chart data: ${error.message}`);
 }
 
 
@@ -270,11 +274,6 @@ async  calculateCurrentMonthEarnings() {
 
 }
 module.exports=adminModel;
-
-
-
-
-
 
 
 

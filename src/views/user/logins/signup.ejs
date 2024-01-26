@@ -95,6 +95,34 @@
                                                         class="form-control">
                                                     <span class="error-message" id="otp-error"></span>
                                                 </div>
+
+                                                <!-- <div class="form-group">
+                                                    <input type="text" name="otp" placeholder="OTP" id="otp" class="form-control">
+                                                    <span class="error-message" id="otp-error"></span>
+                                                    <p id="resend-btn" style="display: none;">didn't recieved an otp? <button type="button" class="resbtn" id="resend-btn" onclick="resendOTP()">Resend</button></p>
+                                                    <span id="timerdiv" style="display: none;"> Resend otp in: <span id="timer"></span></span>
+                                                  </div> -->
+
+
+                                                  <form id="otp-form">
+                                                    <div class="form-group">
+                                                      <input id="otp" name="otp" class="form-control" placeholder="Enter OTP" type="text">
+                                                       <p id="phone" value="<#%- phone %>" hidden></p>
+                                                      <div id="otp-error" class="invalid-feedback"></div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                      <button type="submit" class="btn btn-fill-out btn-block w-100 hover-up" name="verify" id="verify-button">VERIFY OTP</button>
+                                                      <span id="timerdiv" style="display: none;"> Resend OTP in: <span id="timer"></span></span>
+                                                      <!-- <p id="resend-btn" style="display: none;">Didn't receive an OTP? < type="text" class="resbtn" onclick="resendOTP()">Resend OTP</p> -->
+                                                      <p id="resend-btn" style="display: none;">Didn't receive an OTP? <span class="resbtn" onclick="sendOTP()">Resend OTP</span></p>
+                            
+                                                    </div>
+                                                  </form>
+
+
+
+
+
                                                 <div class="form-group">
                                                     <div class="chek-form">
                                                         <div class="custome-checkbox">
@@ -150,3 +178,51 @@
 </body>
 
 </html>
+
+<script>
+    // Function to start the OTP timer
+    function startOTPTimer() {
+      var timer = 50; // Set the initial timer value in seconds
+  
+      var timerInterval = setInterval(function () {
+        document.getElementById('timerdiv').style.display = 'block';
+        document.getElementById('timer').innerText = timer;
+        timer--;
+  
+        if (timer < 0) {
+          clearInterval(timerInterval);
+          document.getElementById('timerdiv').style.display = 'none';
+          document.getElementById('resend-btn').style.display = 'block';
+          document.getElementById('verify-button').disabled=true;
+        }else{
+        document.getElementById('verify-button').disabled=false;
+        }
+      }, 1000);
+    }
+  
+    // Function to resend OTP (you can implement your resend logic here)
+  
+   async function sendOTP() {
+  
+      // Implement your OTP resend logic here
+  
+      // Start the timer again after resending OTP
+      const response = await fetch('/resentOtp',{
+        method:'GET'
+      })
+      if(response.status === 200) {
+        alert('Otp Send Sucessfully')
+        startOTPTimer();
+      } else {
+        alert('Sorry for your inconvienience')
+      }
+    }
+  
+    // Call the startOTPTimer function when the page loads
+  
+    window.onload = function () {
+      startOTPTimer();
+    };
+  </script>
+  
+  

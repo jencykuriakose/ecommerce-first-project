@@ -63,7 +63,7 @@ adminRouter.route('/sales-report/download-excel').get(IsAdminLoggedIn,adminContr
 
 adminRouter.route("/graph").get(IsAdminLoggedIn,adminController.getGraphData);
 
-  adminRouter.route("/chart").get(IsAdminLoggedIn,adminController.getChartData);
+  adminRouter.route("/chart").get(IsAdminLoggedIn,adminController.fetchChartData);
 
 // adminRouter.route('*').get(adminController.get404);
 

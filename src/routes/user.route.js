@@ -76,6 +76,10 @@ userRouter.route('/verify-payment').post(IsLoggedIn, orderController.VerifyPayme
 
 userRouter.route('/order-successfull/:id').get(IsLoggedIn,orderController.SuccessPage);
 
+userRouter.route('/order-failed/:id').get(IsLoggedIn,orderController.Failedpage);
+
+
+
 userRouter.route('/order-cancel').post(IsLoggedIn,orderController.CancelOrder);
 
 userRouter.route('/order-details').get(IsLoggedIn,orderController.getOrderDetails);
@@ -94,13 +98,18 @@ userRouter.route('/apply-wallet').post(IsLoggedIn,orderController.ApplyWallet);
 
 // userRouter.route('*').get(userController.get404);
 
-userRouter.route('/invoice').get(userController.getInvoice);
+userRouter.route('/download-invoice').get(userController.getInvoice);
+
+// wishlist
 
  userRouter.route('/wishlist').get(IsLoggedIn,cartController.getWishlist);
 
  userRouter.route('/wishlist').post(IsLoggedIn,cartController.postWishlist);
 
- userRouter.route('/wishlist').delete(IsLoggedIn,cartController.RemoveFromWishlist);
+ userRouter.route('/wishlist/:productId').delete(IsLoggedIn,cartController.RemoveFromWishlist);
+
+
+ 
 
  userRouter.route('/search-result').get(productController.ProductBySearch);
 
