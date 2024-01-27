@@ -40,6 +40,12 @@ const userSchema = new mongoose.Schema({
 		type:Number,
 		default:0
 	  },
+	referral:{
+		type:String
+	},
+	users:{
+		type: []
+	},
 	couponHistory: {
 	type: [{
 		type: mongoose.Schema.Types.ObjectId,

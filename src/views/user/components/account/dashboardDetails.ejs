@@ -12,6 +12,12 @@
         <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your
           <a href="#">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a></p>
       </div>
+      <div class="card-body">
+        <h5 class="mb-0">Referral Code</h5>
+        <br>
+        <p id="referralCode"><%= userData.referral %></p>
+<button class="btn btn-primary btn-sm" onclick="copyToClipboard()">Copy Referral Code</button>
+      </div>
       <% } else { %>
         <div class="card-body">
           <p> <a href="/signup"> Create new account</a></p>
@@ -20,3 +26,37 @@
 
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+  function copyToClipboard() {
+    // Get the text content of the referral code element
+    const referralCodeElement = document.getElementById('referralCode');
+    const referralCode = referralCodeElement.innerText;
+
+    // Create a temporary textarea element
+    const textarea = document.createElement('textarea');
+    textarea.value = referralCode;
+    document.body.appendChild(textarea);
+
+    // Select the text inside the textarea
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+
+    // Execute the copy command
+    document.execCommand('copy');
+
+    // Remove the temporary textarea
+    document.body.removeChild(textarea);
+
+    // Use SweetAlert to show a message
+    Swal.fire({
+      icon: 'success',
+      title: 'Referral Code Copied!',
+      text: 'The referral code has been copied to the clipboard.',
+      timer: 2000, // Optional: Automatically close after 2 seconds
+      timerProgressBar: true,
+    });
+  }
+</script>

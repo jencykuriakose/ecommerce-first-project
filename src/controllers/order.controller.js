@@ -3,6 +3,7 @@ const productDatabase = require("../schema/product.schema");
 const cartModel = require("../models/cart.model");
 const orderModel = require("../models/order.model");
 const couponModel=require("../models/coupon.model");
+const transactionDatabase=require("../schema/transaction.history");
 const Razorpay=require("../config/rayzorpay");
 const { handleError } = require("../middleware/error-handler.middleware");
 const { LogInstance } = require("twilio/lib/rest/serverless/v1/service/environment/log");
@@ -138,16 +139,16 @@ const PostCheckOut = async (req, res) => {
 					order:razorPayOrder,
 				});
 			}
-else if(paymentmethod==='wallet'){
-	if (res.session.userId >=cartTotal) {
-		return res.json({
-			success: true,
-			paymethod: "wallet",
-			message: "order details added!",
-			orderId: checkoutResult.order._id
-		});
-}
-}
+// else if(paymentmethod==='wallet'){
+// 	if (res.session.userId >=cartTotal) {
+// 		return res.json({
+// 			success: true,
+// 			paymethod: "wallet",
+// 			message: "order details added!",
+// 			orderId: checkoutResult.order._id
+// 		});
+// }
+// }
 	} else {
 		return res.json({ success: false, message: "something goes wrong" });
 	}
@@ -310,30 +311,42 @@ const returnOrder= async(req,res)=>{
 
 
 
-const GetWallet=async(req,res)=>{
-	try{
-		const walletAmount= await ordermodel.getwallet(req.session.user._id);
-		if(walletAmount.status){
-			return res.render('user/wallet',{
-				walletAmount:walletAmount.amount,
-				walletPending:walletAmount.pendingWallet,
-			});
-		}else{
-			return res.render('user/wallet',{
-				walletAmount:walletAmount.amount,
-				walletPending:walletAmount.pendingWallet,
-			});
-		}
-	}catch(error){
-		handleError(res,error);
-	}
-}
+const GetWallet = async (req, res) => {
+    try {
+        const transaction = await transactionDatabase.findOne({ user: req.session.user._id });
+        const walletAmount = await ordermodel.getwallet(req.session.user._id);
+
+        let templateData = {};
+
+        if (walletAmount.status) {
+            templateData = {
+                walletAmount: walletAmount.amount,
+                walletPending: walletAmount.pendingWallet,
+            };
+        } else {
+            templateData = {
+                walletAmount: walletAmount.amount,
+                walletPending: walletAmount.pendingWallet,
+            };
+        }
+
+        // Pass the transaction data if it exists
+        templateData.transaction = transaction || {};
+
+        return res.render('user/wallet', templateData);
+
+    } catch (error) {
+        handleError(res, error);
+    }
+};
+
 
 
 const ApplyWallet=async (req,res)=>{
 try {
-	const walletAmount=req.body.walletInput;
 	const userId=req.session.user._id;
+	const walletAmount=req.body.walletInput;
+	// const userId=req.session.user._id;
 	const result=await cartmodel.cartProductTotal(userId);
 	const response=await ordermodel.getUserData(userId);
 	if(!result.status){
@@ -364,6 +377,26 @@ try {
 	let walletBalance=totalWallet-walletAmount;
 	req.session.appliedWallet=walletAmount;
 
+	const transaction = await transactionDatabase.findOne({ user: userId });
+	if(transaction){
+		transaction.amount = walletAmount
+		transaction.type = "Credited"
+		transaction.orderId = response._id
+		transaction.paymentMethod = "Wallet"
+
+		await transaction.save()
+	}else{
+		await transactionDatabase.create({
+			user: userId,
+			amount: walletAmount,
+			type: "Credited",
+			orderId: response._id,
+			paymentMethod: "Wallet",
+		});
+		console.log("success 2");
+
+	}
+
 	return res.json({success:true,cartTotal,walletBalance});	
 } catch (error) {	
 	handleError(res,error);
@@ -384,6 +417,25 @@ const Failedpage=async(req,res)=>{
 
 
 
+const showTransactionHistory = async (req, res) => {
+    try {
+        const userId = req.session.userId; 
+        const transactions = await transactionDatabase.find({ user: userId });
+
+        if (transactions.length > 0) {
+            res.status(200).json({ success: true, transactions });
+        } else {
+            res.status(404).json({ success: false, message: 'No transaction history found for the user' });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
+
+
+
 
 
 module.exports = {
@@ -400,5 +452,6 @@ module.exports = {
 	returnOrder,
 	GetWallet,
 	ApplyWallet,
-	VerifyPayment
+	VerifyPayment,
+	showTransactionHistory
 }

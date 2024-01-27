@@ -2,6 +2,7 @@ const utils = require("./utils");
 const UserModel = require("../models/userAuth.model");
 const ProductModel = require("../models/product.model");
 const CategoryModel = require("../models/category.model");
+const userSchema = require("../schema/user.schema")
 const orderModel=require("../models/order.model");
 const { signupvalidationSchema, updateUserSchema,resetPasswordSchema } = require("../config/joi");
 const { json } = require("body-parser");
@@ -36,18 +37,43 @@ const getSignup = async (req, res) => {
 	res.render("user/logins/signup");
 };
 
+function generateReferralCode(length) {
+	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	let referralCode = '';
+  
+	for (let i = 0; i < length; i++) {
+	  const randomIndex = Math.floor(Math.random() * characters.length);
+	  referralCode += characters.charAt(randomIndex);
+	}
+  
+	return referralCode;
+  }
+
 const postSignup = async (req, res) => {
 	const validation = signupvalidationSchema.validate(req.body, {
 		abortEarly: false
 	});
-	if (validation.error) {
-		return res.status(400).json({ error: validation.error.details[0].message });
-	}
-
+	console.log("Call 1");
+	// if (validation.error) {
+	// 	return res.status(400).json({ error: validation.error.details[0].message });
+	// }
+	console.log("Call 2");
 	const data = req.body;
+
+
+	if (data.referral) {
+        const referredUser = await userSchema.findOne({referral:data.referral});
+		console.log("🤪",referredUser);
+        if (!referredUser) {
+            return res.status(400).json({ error: "Invalid referral code" });
+        }
+    }
+
+	const referralCode = generateReferralCode(8);
+	console.log("Data",data);
 	const isOtpCorrect = await utils.verifyOtp(data.phone, data.otp);
 	if (!isOtpCorrect) return res.status(400).json({ error: "otp is invalid" });
-	const { status, user } = await userModel.createUser(data);
+	const { status, user } = await userModel.createUser(data, referralCode);
 
 	if (!status) return res.status(400).json({ error: "something wrong", status });
 	req.session.user = user;

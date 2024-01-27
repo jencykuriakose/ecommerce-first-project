@@ -1,7 +1,5 @@
 (function ($) {
   'use strict';
-
-
   if ($('#myChart').length) {
     var ctx = document.getElementById('myChart').getContext('2d');
     var chart = new Chart(ctx, {
@@ -121,6 +119,68 @@ if ($('#myChart2').length) {
     });
 
   }
+
+  //3rd pie chart
+  if ($('#pieChart').length) {
+    var ctx = document.getElementById('pieChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'chart',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Revenue',
+            tension: 0.3,
+            fill: true,
+            backgroundColor: 'rgba(44, 120, 220, 0.2)',
+            borderColor: 'rgba(44, 120, 220)',
+            data: [],
+          },
+
+          {
+            label: 'Products',
+            tension: 0.3,
+            fill: true,
+            backgroundColor: 'rgba(380, 200, 230, 0.2)',
+            borderColor: 'rgb(380, 200, 230)',
+            data: [],
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          legend: {
+            labels: {
+              usePointStyle: true,
+            },
+          },
+        },
+      },
+    });
+
+  
+  
+  $.ajax({
+    url: '/admin/pie-chart',
+    method: 'GET',
+    success: function (data) {
+      if (data.success) {
+        console.log(data);
+        //graph one
+        chart.data.labels = data.labels;
+        chart.data.datasets[0].data = data.sales;
+        chart.data.datasets[1].data = data.products;
+
+        chart.update();
+      } else {
+        console.log('Error: ' + data.message);
+      }
+    },
+    error: function (error) {
+      console.log('Error fetching data:', error);
+    },
+  });
+}
 
 
   //?chart two old dummy data⬇️

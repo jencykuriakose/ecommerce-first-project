@@ -107,6 +107,41 @@
                             </div>
                         </div>
 
+                        <div class="card col-12 mb-4">
+                            <div class="row box-right">
+                                <div class="col-md-8 ps-0">
+                                    <p class="ps-3 text-muted fw-bold h6 mb-0">Transaction History</p>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Amount</th>
+                                                <th>Type</th>
+                                                <th>Payment Method</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (transaction && transaction.amount) { %>
+                                                <tr>
+                                                    <td><%= transaction.amount %></td>
+                                                    <td><%= transaction.type %></td>
+                                                    <td><%= transaction.paymentMethod %></td>
+                                                    <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                                                </tr>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="4">No transaction history available.</td>
+                                                </tr>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+
 
                     </div>
                 </div>

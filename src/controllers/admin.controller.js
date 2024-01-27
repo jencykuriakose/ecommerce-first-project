@@ -200,7 +200,6 @@ const getGraphData=async (req,res)=>{
 
 const fetchChartData=async (req,res)=>{
 	 try {
-		console.log(popularProducts,"popularProducts");
 		const result = await adminmodel.ChartData();
 		if (result.status) {
 		  const { popularProducts } = result;
@@ -261,6 +260,23 @@ const GetReportExcel=async(req,res)=>{
 	} catch (error) {
 		handleError(res,error)
 	}
+}
+
+const getPieChart = async (req, res) => {
+	try{
+		const result=await adminModel.getDashboardData();
+	}catch(error){
+		handleError(res,error);
+	}
+	const result=await adminmodel.getDashboardData();
+	res.render("admin/dashboard",{
+	totalRevenue: result.totalRevenue,
+      totalOrdersCount: result.totalOrdersCount,
+      totalProductsCount: result.totalProductsCount,
+      totalCategoriesCount: result.totalCategoriesCount,
+      currentMonthEarnings: result.currentMonthEarnings,
+      activePage:'dashboard'
+});
 }
 
 

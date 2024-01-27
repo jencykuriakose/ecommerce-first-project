@@ -11,11 +11,38 @@ class UserModel {
 		return userExist;
 	}
 
-	async createUser(data) {
-		const user = await UserDatabase.create({ ...data });
-		return { status: true, user };
-	}
+	// async createUser(data, referralCode) {
+	// 	const user = new UserDatabase({
+	// 		...data,
+	// 		referral: referralCode,
+	// 	  });
+		  
+	// 	await user.save();
 
+	// 	return { status: true, user };
+	// }
+	async createUser(data, referralCode) {
+		const user = new UserDatabase({
+			...data,
+			referral: referralCode,
+		});
+	
+		try {
+			const savedUser = await user.save();
+			const userId = savedUser._id; // Access the _id field
+			const referredUser = await userSchema.findOne({referral:referralCode});
+			if(referredUser){
+				referredUser.users = userId
+				await referredUser.save()
+			}
+
+			return { status: true, user: savedUser, userId };
+		} catch (error) {
+			// Handle any error that might occur during save
+			console.error("Error saving user:", error);
+			return { status: false, error };
+		}
+	}
 	async fetchAllUsers() {
 		const users = await UserDatabase.find({});
 		return { status: true, users };

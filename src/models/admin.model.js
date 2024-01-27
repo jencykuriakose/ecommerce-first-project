@@ -122,7 +122,6 @@ async graphData(){
 
 
 async ChartData(){
-  console.log(popularProducts,"popularProducts");
   const popularProducts = await orderDatabase.aggregate([
     {
       $unwind: '$items',
