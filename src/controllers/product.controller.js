@@ -12,13 +12,14 @@ const getProducts = async (req, res) => {
 	const limit = parseInt(req.query.limit) || 10;
 	const productsResult = await productModel.GetAllproducts(page, limit);
 	const categoryResult = await categoryModel.fetchCategories();
+
 	res.render("admin/products", {
 		products: productsResult.products,
 		categories: categoryResult.categories,
 		totalPages: productsResult.totalPages,
 		currentPage: productsResult.currentPage,
 		limit: productsResult.limit,
-		activePage: "products"
+		activePage: "products",
 	});
 };
 
@@ -31,7 +32,6 @@ const GetAddproducts = async (req, res) => {
 };
 
 const PostAddProduct = async (req, res) => {
-	   console.log("✅");
 	if(req.fileValidationError){
 return res.status(400).json({error:res.fileValidationError.message});
 	}
@@ -118,29 +118,57 @@ const deleteproduct = async (req, res) => {
 
 //user can view the product in shop page 
 
-const getallproducts=async (req,res)=>{
+// const getallproducts=async (req,res)=>{
+// 	const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 8;
+//     const sortBy = req.query.sortBy;
+//     const allProductsResult = await productModel.GetAllproducts(page, limit, sortBy);
+//     res.render('user/all-products',
+// 	 {
+//       products: allProductsResult.products,
+//       totalPages: allProductsResult.totalPages,
+//       currentPage: allProductsResult.currentPage,
+//       limit: allProductsResult.limit,
+//       productCount: allProductsResult.productCount,
+// 	  sortOption:sortBy
+//     });
+// }
+
+const getallproducts = async (req, res) => {
 	const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 8;
-    const sortBy = req.query.sortBy;
-    const allProductsResult = await productModel.GetAllproducts(page, limit, sortBy);
-    res.render('user/all-products',
-	 {
-      products: allProductsResult.products,
-      totalPages: allProductsResult.totalPages,
-      currentPage: allProductsResult.currentPage,
-      limit: allProductsResult.limit,
-      productCount: allProductsResult.productCount,
-	  sortOption:sortBy
-    });
-}
+	const limit = parseInt(req.query.limit) || 8;
+	const sortBy = req.query.sortBy; // Extract sorting criteria from the URL
+	const allProductsResult = await productModel.GetAllproducts(page, limit, sortBy);
+	
+	// Pass sorting criteria to the template
+	res.render('user/all-products', {
+	  products: allProductsResult.products,
+	  totalPages: allProductsResult.totalPages,
+	  currentPage: allProductsResult.currentPage,
+	  limit: allProductsResult.limit,
+	  productCount: allProductsResult.productCount,
+	  sortOption: sortBy,
+	});
+  };
+  
+
+
+
+
+
+
+
+
+
+
 
 
 //userview of products details
 
 const LoadProductDetails = async (req, res) => {
-	console.log(req.params);
-	console.log(req.query);
-	console.log(req.body);
+	// console.log(req.params);
+	// console.log(req.query);
+	// console.log(req.body);
 
 	const productId = req.params.productId;
 
@@ -190,7 +218,8 @@ const ProductBySearch = async (req, res) => {
     try {
         const searchTerm = req.query.keyword;
 		console.log(searchTerm)
-        const searchRegex = new RegExp(`^${searchTerm}`, 'gi');
+        // const searchRegex = new RegExp(`^${searchTerm}`, 'gi');
+		const searchRegex = new RegExp(`\\b${searchTerm}`, 'i');
         const searchproducts = await productModel.searchProductsWithRegex(searchRegex);
 		res.render('user/search-result',{products:searchproducts});
     } catch (error) {

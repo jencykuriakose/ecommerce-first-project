@@ -1,5 +1,6 @@
 const { compare } = require("bcrypt");
 const UserDatabase = require("../schema/user.schema");
+const userSchema = require("../schema/user.schema")
 const { comparePassword,hashPassword } = require("../config/security");
 const cloudinary = require("../config/cloudinary");
 
@@ -28,21 +29,30 @@ class UserModel {
 		});
 	
 		try {
-			const savedUser = await user.save();
-			const userId = savedUser._id; // Access the _id field
-			const referredUser = await userSchema.findOne({referral:referralCode});
-			if(referredUser){
-				referredUser.users = userId
-				await referredUser.save()
+			const referredUser = await userSchema.findOne({ referral: data.referral });
+	
+			if (referredUser) {
+				// Check if the user hasn't been referred before
+				if (!referredUser.users.includes(user._id)) {
+					// Add referral bonus to the referred user
+					referredUser.users.push(user._id);
+					referredUser.wallet += 50;
+					await referredUser.save();
+	
+					// Add referral bonus to the new user
+					user.wallet += 50;
+				}
 			}
-
-			return { status: true, user: savedUser, userId };
+	
+			const savedUser = await user.save();
+			return { status: true, user: savedUser, userId: savedUser._id };
+	
 		} catch (error) {
-			// Handle any error that might occur during save
 			console.error("Error saving user:", error);
 			return { status: false, error };
 		}
 	}
+	
 	async fetchAllUsers() {
 		const users = await UserDatabase.find({});
 		return { status: true, users };

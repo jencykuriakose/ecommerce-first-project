@@ -50,7 +50,7 @@
 
                                                     <td>
                                                         <h5 class="product-name"><a
-                                                                href="/product/<%= item.product.slug %>">
+                                                                href="/product/<%= item.product.id %>">
                                                                 <%= item.product.productName %>
                                                             </a></h5> <span qty-navbar-<%=item.product._id %>"
                                                             class="product-qty">x <%= item.quantity %> </span>
@@ -73,14 +73,14 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Discount</th>
-                                                        <td class="product-subtotal" colspan="2">₹
-                                                          
+                                                        <td class="product-subtotal" colspan="2">₹<%=
+                                                            Math.floor((orderData?.discount|| 0))  %>
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <th>Wallet</th>
-                                                        <td class="product-subtotal" colspan="2">₹
-                                                         
+                                                        <td class="product-subtotal" colspan="2">₹<%=
+                                                          Math.floor((orderData?.wallet|| 0))  %>
                                                         </td>
                                                     </tr>
 

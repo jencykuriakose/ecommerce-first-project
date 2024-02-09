@@ -29,9 +29,12 @@
                                                 <%=address.zipcode %><br>
                                                     <%=address.phone %>
                                 </address>
-                                <p>
+                                <p>  
                                     <%=address.country %>
                                 </p>
+                                <!-- Inside the forEach loop for shipping addresses -->
+                                <a onclick="editAddress('<%= address._id %>', '<%= address.fname %>', '<%= address.phone %>', '<%= address.street_address %>', '<%= address.address %>', '<%= address.city %>', '<%= address.country %>', '<%= address.state %>', '<%= address.district %>', '<%= address.zipcode %>')" class="edit-address-btn btn-small">Edit</a>
+                                <span style="margin-right: 50px;"></span>
                                 <a onclick="deleteAddress('<%= address._id %>')" class="btn-small">Delete</a>
                             </div>
                         </div>
@@ -44,7 +47,137 @@
 </div>  
 
 
+<div id="ModalEditAddress" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="checkout-title">Billing Details</h2>
+            </div>
+            <div class="modal-body">
+                
+                <form id="addressForm" role="form" method="POST" action="/editAddress">
+                    <input type="hidden" name="address-id" >
+                    <div class="form-group">
+                         
+                        <div class="p-5">
 
+
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>First Name*</label>
+                                    <input name="name" type="text" class="form-control">
+                                    <small  class="error-message" id="name-error"></small>
+                                </div><!-- End .col-sm-6 -->
+
+                                <div class="col-sm-6">
+                                    <label>Phone: *</label>
+                                    <input name="mobile" type="text" class="form-control">
+                                    <small  class="error-message" id="mobile-error"></small>
+                                </div><!-- End .col-sm-6 -->
+                            </div><!-- End .row -->
+
+                            
+                            <label>Street address *</label>
+                            <input name="street" type="text" class="form-control" placeholder="Street name">
+                            <small  class="error-message" id="street-error"></small>
+                            <label>Address *</label>
+                            <input name="address" type="text" class="form-control" placeholder="Address ">
+                            <small  class="error-message" id="address-error"></small>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>Town / City *</label>
+                                    <input name="city" type="text" class="form-control">
+                                    <small  class="error-message" id="city-error"></small>
+                                </div><!-- End .col-sm-6 -->
+
+                                <div class="col-sm-6">
+                                    <label>Country *</label>
+                                    <input name="country" type="text" class="form-control">
+                                    <small  class="error-message" id="country-error"></small>
+                                </div><!-- End .col-sm-6 -->
+
+                                <div class="col-sm-6">
+                                    <label>State *</label>
+                                    <input name="state" type="text" class="form-control">
+                                    <small  class="error-message" id="state-error"></small>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>District *</label>
+                                    <input name="district" type="tel" class="form-control">
+                                    <small  class="error-message" id="district-error"></small>
+                                </div><!-- End .col-sm-6 -->
+                            </div><!-- End .row -->
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>zipcode / ZIP *</label>
+                                    <input name="pincode" type="text" class="form-control">
+                                    <small  class="error-message" id="pincode-error"></small>
+                                </div><!-- End .col-sm-6 -->
+
+
+                            </div><!-- End .row -->
+
+                            
+                        <div>
+                            <button  type="submit" class="btn btn-success">
+                                Update
+                        </div>
+
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the modal element
+        const editAddressModal = document.getElementById('ModalEditAddress');
+
+        // Attach click event listeners to all "Edit Address" buttons
+        const editAddressButtons = document.querySelectorAll('.edit-address-btn');
+        editAddressButtons.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                // Prevent the default link behavior
+                event.preventDefault();
+
+                // Get the address details from the data attributes
+                const addressId = button.getAttribute('data-address-id');
+                const name = button.getAttribute('data-name');
+                const mobile = button.getAttribute('data-mobile');
+                const street = button.getAttribute('data-street');
+                const address = button.getAttribute('data-address');
+                const city = button.getAttribute('data-city');
+                const country = button.getAttribute('data-country');
+                const state = button.getAttribute('data-state');
+                const district = button.getAttribute('data-district');
+                const pincode = button.getAttribute('data-pincode');
+
+                // Populate the form fields with the address details
+                const form = editAddressModal.querySelector('#addressForm');
+                const addressIdInput = form.querySelector('[name="address-id"]');
+                addressIdInput.value = addressId;
+                form.querySelector('[name="name"]').value = name;
+                form.querySelector('[name="mobile"]').value = mobile;
+                form.querySelector('[name="street"]').value = street;
+                form.querySelector('[name="address"]').value = address;
+                form.querySelector('[name="city"]').value = city;
+                form.querySelector('[name="country"]').value = country;
+                form.querySelector('[name="state"]').value = state;
+                form.querySelector('[name="district"]').value = district;
+                form.querySelector('[name="pincode"]').value = pincode;
+
+                // Open the modal
+                $('#ModalEditAddress').modal('show');
+            });
+        });
+    });
+</script>
 <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -595,4 +728,47 @@
 
         }
     });
+
+
+
+    function editAddress(addressId) {
+    // Assuming you have a form for editing the address with id="editAddressForm"
+    const form = document.getElementById('editAddressForm');
+
+    // Assuming you have a modal for displaying the edit form with id="editAddressModal"
+    const modal = document.getElementById('editAddressModal');
+
+    // Fetch the address data based on the addressId
+    fetch(`/get-address/${addressId}`)
+        .then(response => response.json())
+        .then(addressData => {
+            // Populate the form fields with the retrieved address data
+            const fnameError = document.querySelector('#fnameError');
+        const lnameError = document.querySelector('#lnameError');
+        const countryError = document.querySelector('#countryError');
+        const billingAddressError = document.querySelector('#billingAddressError');
+        const cityError = document.querySelector('#cityError');
+        const stateError = document.querySelector('#stateError');
+        const postError = document.querySelector('#postError');
+        const phoneError = document.querySelector('#phoneError');
+        const emailError = document.querySelector('#emailError');
+
+            // Display the modal
+            $(modal).modal('show');
+        })
+        .catch(error => {
+            console.error('Error fetching address data:', error);
+            // Handle error, e.g., display an error message to the user
+        });
+}
+
+
+
+
+
+
+
+
+
 </script>
+

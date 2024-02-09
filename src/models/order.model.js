@@ -7,6 +7,8 @@ const { addressSchema } = require("../config/joi");
 const productModel=require("../models/product.model");
 const crypto = require("crypto");
 const moment = require("moment");
+const transactionHistory = require("../schema/transaction.history");
+const { log } = require("console");
 
 const productmodel=new productModel();
 
@@ -200,6 +202,15 @@ class orderModel {
 		}
 	}
 
+	async editAddress(addressId){
+		const result=await addressDatabase.findByIdAndUpdate(addressId);
+		if (result) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	async fetchorderuserdetails(userId, page, limit) {
 		const orders = await orderDatabase
 			.find({ user: userId })
@@ -354,6 +365,8 @@ class orderModel {
 	}
 
 	async changeOrderStatus(changeStatus, orderId) {
+
+		console.log("enteredd//////////////////");
 	
 		if (!["shipped", "delivered", "canceled", "returned"].includes(changeStatus)) {
 			throw new Error("Invalid status");
@@ -363,6 +376,7 @@ class orderModel {
 				status: changeStatus
 			}
 		});
+		const userId = orderResult.user;
 		if (changeStatus === 'returned' || changeStatus === 'canceled' && orderResult.paymentmethod !== 'cashOnDelivery') {
 			const orderResult = await orderDatabase.findById(orderId).select('total user');
 			const { total, user } = orderResult;
@@ -376,9 +390,25 @@ class orderModel {
 				wallet: updatedWallet,
 			  },
 			});
+
+			
+			const debitedTransaction = {
+				user: userId,
+				amount: total,
+				type: "Credited",
+				orderId: orderId,
+				// paymentMethod: orderResult.paymentmethod,
+				date: Date.now()
+			};
+			
+			// Use insertOne for inserting a single document
+			await transactionHistory.create(debitedTransaction);
+			console.log("Transaction history added:", debitedTransaction);
 		  }
+		  
+		
 		  if(changeStatus === 'returned' || changeStatus  === 'canceled'){
-			await productmodel.updateProductStocks(orderId, changeStatus);
+			await productmodel.updateProductStocks(orderId, changeStatus); 
 		  }
 		if (orderResult) {
 			return { status: true, message: "order updated" };

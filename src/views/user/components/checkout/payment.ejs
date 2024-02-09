@@ -310,7 +310,8 @@
 
         applyButton.addEventListener('click', (event) => {
             event.preventDefault();
-            alert("coupon clicked")
+            // alert("coupon clicked")
+           
             const couponName = document.getElementById('couponName').value;
             const url = '/apply-coupon';
             fetch(url, {
@@ -326,6 +327,12 @@
                 if (res.success) {
 
                     //apply discount amount
+                    Swal.fire({
+            icon: 'success',
+            title: 'Coupon Applied Successfully!',
+            text: 'You have successfully applied the coupon.',
+            confirmButtonText: 'Great!'
+                    });
 
                     discountElement.textContent = res.discount.toFixed(2);
                     let totalAmount = + totalElement.textContent;
@@ -345,6 +352,15 @@
                     }, 5000);
 
                 } else {
+
+
+                    Swal.fire({
+            icon: 'success',
+            title: 'Coupon Applied Successfully!',
+            text: 'You have successfully applied the coupon.',
+            confirmButtonText: 'Great!'
+            // You can customize the appearance and behavior further if needed
+        });
                     errMsg.style.color = 'red';
                     errMsg.textContent = res.message;
                     couponInput.style.border = '1px solid red';

@@ -194,43 +194,43 @@
     });
 
 
-    $(document).ready(function () {
-        $('#otp-button').click(function () {
+    // $(document).ready(function () {
+    //     $('#otp-button').click(function () {
             
-            otpButton.disabled = true;
-            setTimeout(() => {
-                otpButton.disabled = false;
-            }, 30000)
+    //         otpButton.disabled = true;
+    //         setTimeout(() => {
+    //             otpButton.disabled = false;
+    //         }, 30000)
             
-            var phone = $('#phone').val();
-            $.ajax({
-                type: 'POST',
-                url: '/signup-otp',
-                data: { phone: phone },
-                success: function (response) {
-                    // Handle successful response
-                    console.log(response);
-                    if (!response) {
-                        document.getElementById('phone-error-verify').style.display = 'block';
-                        document.getElementById('phone-error-verify').innerHTML = "Phone number already registered";
-                        setTimeout(() => {
-                            document.getElementById('phone-error-verify').style.display = 'none';
-                        }, 5000)
-                        otpButton.disabled = false;
+    //         var phone = $('#phone').val();
+    //         $.ajax({
+    //             type: 'POST',
+    //             url: '/signup-otp',
+    //             data: { phone: phone },
+    //             success: function (response) {
+    //                 // Handle successful response
+    //                 console.log(response);
+    //                 if (!response) {
+    //                     document.getElementById('phone-error-verify').style.display = 'block';
+    //                     document.getElementById('phone-error-verify').innerHTML = "Phone number already registered";
+    //                     setTimeout(() => {
+    //                         document.getElementById('phone-error-verify').style.display = 'none';
+    //                     }, 5000)
+    //                     otpButton.disabled = false;
 
-                    } else {
-                        document.getElementById('phone-error-verify').style.display = 'none';
-                    }
-                },
-                error: function (xhr, status, error) {
-                    // Handle error response
-                    console.log(error);
-                }
-            });
+    //                 } else {
+    //                     document.getElementById('phone-error-verify').style.display = 'none';
+    //                 }
+    //             },
+    //             error: function (xhr, status, error) {
+    //                 // Handle error response
+    //                 console.log(error);
+    //             }
+    //         });
 
-            return true;
-        });
-    });
+    //         return true;
+        //  });
+    //  });
 
     $(document).ready(function () {
         $('#formValid').on('submit', function (e) {

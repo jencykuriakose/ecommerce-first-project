@@ -8,7 +8,8 @@ const signupvalidationSchema = joi.object({
 	password: joi.string().required(),
 	confirmpassword: joi.string().required(),
 	otp: joi.string().required(),
-	checkbox: joi.optional()
+	checkbox: joi.optional(),
+	refferal:joi.string()
 });
 
 //add-product

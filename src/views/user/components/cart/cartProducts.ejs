@@ -73,10 +73,29 @@ function incrementQty(productId){
   }
   updateButtons(productId,currentQty,stockQuantity);
 }
-function decrementQty(productId){
+// function decrementQty(productId){
 
-}
+// }
 // 
+
+
+function decrementQty(productId) {
+  let quantityElement = document.getElementById('qty-' + productId);
+  let currentQty = parseInt(quantityElement.getAttribute('data-quantity'));
+  let stockQuantity = parseInt(quantityElement.parentElement.getAttribute('data-stockqty'));
+
+  if (currentQty > 1) {
+    currentQty--;
+    quantityElement.innerText = currentQty;
+    updateButtons(productId, currentQty, stockQuantity);
+  }
+  updateQuantity(productId, -1);
+}
+
+
+
+
+
 
 function updateQuantity(productId, change) {
     var stockQty = parseInt(document.querySelector('.detail-qty[data-productid="' + productId + '"]').getAttribute('data-stockqty'));

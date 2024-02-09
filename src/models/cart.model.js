@@ -204,7 +204,6 @@ if (!product) {
 }
 
 let wishlist = await wishlistDatabase.findOne({ user: userId });
-console.log(wishlist,"✅⚠️🧚‍♀️");
 let productAlreadyExist = false;
 if (wishlist) {
   const itemIndex = wishlist.items.findIndex((item) => item.product.equals(productId));

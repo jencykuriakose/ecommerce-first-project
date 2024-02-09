@@ -199,7 +199,7 @@ const SuccessPage = async (req, res) => {
 	await ordermodel.setSuccessStatus(id);
 
 	if(req.session.coupon){
-		await addCouponData(req.session.coupon,req.session.user._id);
+		await ordermodel.addCouponData(req.session.coupon,req.session.user._id);
 		delete req.session.coupon;
 	}
 	if (req.session.appliedWallet) {
@@ -255,6 +255,7 @@ res.json({ message: 'order canceled successfully', success: true });
 
 
 const changeOrderStatus=async (req,res)=>{
+	console.log("✅");
 	const { orderId,status }=req.body;
 	const result =await ordermodel.changeOrderStatus(status,orderId);
 	if(result.status){
@@ -377,21 +378,34 @@ try {
 	let walletBalance=totalWallet-walletAmount;
 	req.session.appliedWallet=walletAmount;
 
+
+	// const debitedTransaction = await transactionDatabase.create({
+	// 	user: userId,
+	// 	amount: walletAmount,
+	// 	type: "Debited",
+	// 	orderId: response._id,
+	// 	paymentMethod: "Wallet",
+	// 	date: Date.now()
+	// });
+	// await UserModel.findByIdAndUpdate(userId, { walletBalance });
+
+
 	const transaction = await transactionDatabase.findOne({ user: userId });
 	if(transaction){
 		transaction.amount = walletAmount
-		transaction.type = "Credited"
+		transaction.type = "Debited"
 		transaction.orderId = response._id
 		transaction.paymentMethod = "Wallet"
-
+		transaction.date = Date.now()
 		await transaction.save()
 	}else{
 		await transactionDatabase.create({
 			user: userId,
 			amount: walletAmount,
-			type: "Credited",
+			type: "Debited",
 			orderId: response._id,
 			paymentMethod: "Wallet",
+			date : Date.now()
 		});
 		console.log("success 2");
 
