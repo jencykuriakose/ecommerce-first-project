@@ -12,7 +12,8 @@ const ordermodel = new orderModel();
 const cartmodel = new cartModel();
 const couponmodel=new couponModel();
 
-
+const dotenv = require("dotenv");
+dotenv.config({ path: ".env" });
 // admin view the order page
 
 const getorderpage = async (req, res) => {
