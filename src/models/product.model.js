@@ -70,7 +70,7 @@
 		async addNewProduct(dataBody, datafiles) {
 			const { productName, productDescription, productOldPrice, stocks, productCategory } = dataBody;
 			let {productPrice} = dataBody;
-			console.log(dataBody);
+			console.log("product full",dataBody);
 			const category = await categoryDatabase.findById({_id:productCategory});
 			if(category.discount){
 				let discount = (productPrice * category.discount)/100;
@@ -92,15 +92,16 @@
 					folder: "wosofy/product-images",
 					unique_filename: true
 				});
+				console.log("file path ", localFilePath);
 				imageurllist.push(response.url);
 			}
 			product.productimageurl = imageurllist;
 
-			console.log(product.productimageurl);
+			console.log("imgurl",product.productimageurl);
 
 			const result = await product.save();
 
-			console.log(result);
+			console.log("result",result);
 
 			if (result) {
 				return { status: true };

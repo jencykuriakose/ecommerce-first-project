@@ -173,7 +173,7 @@ const LoadProductDetails = async (req, res) => {
 	const productId = req.params.productId;
 
 	const productResult = await productModel.LoadProductDetails(productId);
-	console.log(productResult);
+	console.log("details",productResult);
 	// const allproductResult = await productModel.GetAllproducts();
 
 	if (productResult.status) {
