@@ -222,7 +222,7 @@
 			if (!order) {
 			throw new Error('Order not found');
 			}
-		
+			console.log(order);
 			if (changeStatus === 'returned' || changeStatus === 'canceled') {
 			for (const item of order.items) {
 				const productId = item.product._id;
@@ -234,7 +234,6 @@
 				}
 				product.stocks += returnedQuantity;
 				await product.save();
-		
 			}
 			}
 		} catch (error) {

@@ -1,6 +1,7 @@
 const utils = require("./utils");
 const UserModel = require("../models/userAuth.model");
 const ProductModel = require("../models/product.model");
+const Address = require("../schema/address.schema");
 const CategoryModel = require("../models/category.model");
 const userSchema = require("../schema/user.schema");
 const orderModel = require("../models/order.model");
@@ -13,6 +14,7 @@ const { getOrderDetails } = require("./order.controller");
 const { generateInvoice } = require("../config/pdfKit");
 const { handleError } = require("../middleware/error-handler.middleware");
 const Mail = require("nodemailer/lib/mailer");
+const transactionHistory = require("../schema/transaction.history");
 
 const userModel = new UserModel();
 
@@ -116,7 +118,6 @@ const postSignup = async (req, res) => {
 	}
 
 	const { status, user } = await userModel.createUser(data, referralCode);
-
 	// Handle user creation result
 	if (!status) {
 		return res.status(400).json({ error: "Something went wrong", status });
@@ -290,6 +291,42 @@ const updateuserdata = async (req, res) => {
 	}
 };
 
+const updateAddress = async (req, res) => {
+    console.log("kittyyyy");
+    const { addressId } = req.params; // Assuming addressId is passed as a route parameter
+    const { fname, country, city, street_address, state, zipcode, email, phone } = req.body;
+	console.log(req.body.addressId);
+	console.log(fname, country, city, street_address, state, zipcode, email, phone );
+    // Check if all required fields are present
+    if (!street_address || !state || !zipcode || !email || !phone) {
+        return res.status(400).json({ status: false, message: 'Missing required fields' });
+    }
+
+    try {
+        // Find the address by ID
+        let address = await Address.findById(addressId);
+
+        // Update address fields
+        address.fname = fname;
+        address.country = country;
+        address.city = city;
+        address.street_address = street_address;
+        address.state = state;
+        address.zipcode = zipcode;
+        address.email = email;
+        address.phone = phone;
+
+        // Save the updated address
+        await address.save();
+
+        res.json({ status: true, message: 'Address updated successfully' });
+    } catch (error) {
+        console.error('Error updating address:', error.message);
+        res.status(500).json({ status: false, message: 'Failed to update address' });
+    }
+};
+
+
 const getlogout = (req, res) => {
 	req.session.destroy();
 	res.redirect("/");
@@ -345,5 +382,6 @@ module.exports = {
 	GenerateUniquePassword,
 	ResetPassword,
 	getInvoice,
-	get404
+	get404,
+	updateAddress
 };

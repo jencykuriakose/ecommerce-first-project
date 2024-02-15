@@ -4,22 +4,22 @@
             <div data-bs-toggle="modal" data-bs-target="#addAddressModal">
                 <button class="card-title btn " style="float: right;">Add new address</button>
             </div>
-           
-           
-             <% if (address?.length>0) { %>
-                <% address.forEach(address => { %>
+
+
+            <% if (address?.length>0) { %>
+                <% address.forEach(address=> { %>
 
                     <div class="col-lg-6 mb-20">
                         <div class="card mb-3 mb-lg-0">
                             <div class="card-header">
-                               <% if (address.isBillingAddress) { %> 
+                                <% if (address.isBillingAddress) { %>
 
 
                                     <h5 class="mb-0">Billing Address</h5>
-                                    <% } else { %> 
+                                    <% } else { %>
                                         <h5 class="mb-0">Shipping Address</h5>
 
-                                        <% } %> 
+                                        <% } %>
                             </div>
                             <div class="card-body">
                                 <address>
@@ -29,23 +29,143 @@
                                                 <%=address.zipcode %><br>
                                                     <%=address.phone %>
                                 </address>
-                                <p>  
+                                <p>
                                     <%=address.country %>
                                 </p>
                                 <!-- Inside the forEach loop for shipping addresses -->
-                                <a onclick="editAddress('<%= address._id %>', '<%= address.fname %>', '<%= address.phone %>', '<%= address.street_address %>', '<%= address.address %>', '<%= address.city %>', '<%= address.country %>', '<%= address.state %>', '<%= address.district %>', '<%= address.zipcode %>')" class="edit-address-btn btn-small">Edit</a>
+                                <a onclick="openEditAddressModal('<%= address._id %>', '<%= address.fname %>', '<%= address.phone %>', '<%= address.street_address %>','<%= address.city %>', '<%= address.country %>', '<%= address.state %>', '<%= address.email %>', '<%= address.zipcode %>')"
+                                    class="edit-address-btn btn-small">Edit</a>
+
+
                                 <span style="margin-right: 50px;"></span>
                                 <a onclick="deleteAddress('<%= address._id %>')" class="btn-small">Delete</a>
                             </div>
                         </div>
                     </div>
-                 <% }) %>
-                     <% } %> 
+                    <% }) %>
+                        <% } %>
 
         </div>
     </div>
-</div>  
+</div>
 
+<div class="modal fade" id="editAddressModal" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Address</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Your form goes here -->
+                <form id="editAddressForm">
+                    <input type="hidden" id="editAddressId" name="editAddressId">
+                    <div class="form-group">
+                        <input type="text" id="editFullName" name="editFullName" placeholder="Full Name *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="editPhone" name="editPhone" placeholder="Phone Number *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="editStreetAddress" name="editStreetAddress"
+                            placeholder="Street Address *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="editCity" name="editCity" placeholder="City / Town *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="editCountry" name="editCountry" placeholder="Country *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="editState" name="editState" placeholder="State">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="editEmail" name="editEmail" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="editZipCode" name="editZipCode" placeholder="Zip Code *" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Function to open the edit address modal with pre-filled data
+    function openEditAddressModal(addressId, fullName, phone, streetAddress, city, country, state, email, zipCode) {
+        document.getElementById('editAddressId').value = addressId;
+        document.getElementById('editFullName').value = fullName;
+        document.getElementById('editPhone').value = phone;
+        document.getElementById('editStreetAddress').value = streetAddress;
+        document.getElementById('editCity').value = city;
+        document.getElementById('editCountry').value = country;
+        document.getElementById('editState').value = state;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editZipCode').value = zipCode;
+        $('#editAddressModal').modal('show'); // Show the modal
+    }
+
+    // Event listener for the edit address form submission
+    document.getElementById('editAddressForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent form submission
+        const addressId = document.getElementById('editAddressId').value;
+        const fname = document.getElementById('editFullName').value;
+        const phone = document.getElementById('editPhone').value;
+        const streetAddress = document.getElementById('editStreetAddress').value;
+        const city = document.getElementById('editCity').value;
+        const country = document.getElementById('editCountry').value;
+        const state = document.getElementById('editState').value;
+        const email = document.getElementById('editEmail').value;
+        const zipCode = document.getElementById('editZipCode').value;
+
+        // Assign form field values to addressData object properties
+        const addressData = {
+            addressId: addressId,
+            fname: fname,
+            phone: phone,
+            street_address: streetAddress,
+            city: city,
+            country: country,
+            state: state,
+            email: email,
+            zipcode: zipCode
+        };
+
+        console.log(addressData);
+
+        // Now you can send addressData to the server or insert it into a database
+        // Send data to server for updating address
+        fetch(`/update-address/${addressId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(addressData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Failed to update address');
+            })
+            .then(data => {
+                alert('Address updated successfully');
+                // Optionally, close the modal or update the UI as needed
+                $('#editAddressModal').modal('hide'); // Hide the modal
+                // Optionally, reload the page or update the UI
+            })
+            .catch(error => {
+                console.error('Error updating address:', error.message);
+                alert('Failed to update address. Please try again later.');
+            });
+    });
+</script>
+
+<!-- 
 
 <div id="ModalEditAddress" class="modal fade">
     <div class="modal-dialog" role="document">
@@ -58,7 +178,7 @@
                 <form id="addressForm" role="form" method="POST" action="/editAddress">
                     <input type="hidden" name="address-id" >
                     <div class="form-group">
-                         
+                        
                         <div class="p-5">
 
 
@@ -70,71 +190,72 @@
                                     <small  class="error-message" id="name-error"></small>
                                 </div><!-- End .col-sm-6 -->
 
-                                <div class="col-sm-6">
+<!-- <div class="col-sm-6">
                                     <label>Phone: *</label>
                                     <input name="mobile" type="text" class="form-control">
                                     <small  class="error-message" id="mobile-error"></small>
                                 </div><!-- End .col-sm-6 -->
-                            </div><!-- End .row -->
+<!-- </div>End .row -->
 
-                            
-                            <label>Street address *</label>
+
+<!-- <label>Street address *</label>
                             <input name="street" type="text" class="form-control" placeholder="Street name">
                             <small  class="error-message" id="street-error"></small>
                             <label>Address *</label>
                             <input name="address" type="text" class="form-control" placeholder="Address ">
-                            <small  class="error-message" id="address-error"></small>
+                            <small  class="error-message" id="address-error"></small> -->
 
-                            <div class="row">
+<!-- <div class="row">
                                 <div class="col-sm-6">
                                     <label>Town / City *</label>
                                     <input name="city" type="text" class="form-control">
                                     <small  class="error-message" id="city-error"></small>
-                                </div><!-- End .col-sm-6 -->
+                                </div>End .col-sm-6 -->
 
-                                <div class="col-sm-6">
+<!-- <div class="col-sm-6">
                                     <label>Country *</label>
                                     <input name="country" type="text" class="form-control">
                                     <small  class="error-message" id="country-error"></small>
-                                </div><!-- End .col-sm-6 -->
+                                </div>End .col-sm-6 -->
 
-                                <div class="col-sm-6">
+<!-- <div class="col-sm-6">
                                     <label>State *</label>
                                     <input name="state" type="text" class="form-control">
                                     <small  class="error-message" id="state-error"></small>
-                                </div>
-                                <div class="col-sm-6">
+                                </div> -->
+<!-- <div class="col-sm-6">
                                     <label>District *</label>
                                     <input name="district" type="tel" class="form-control">
                                     <small  class="error-message" id="district-error"></small>
-                                </div><!-- End .col-sm-6 -->
-                            </div><!-- End .row -->
+                                </div> -->
+<!-- End .col-sm-6 -->
+<!-- </div>End .row -->
 
-                            <div class="row">
+<!-- <div class="row">
                                 <div class="col-sm-6">
                                     <label>zipcode / ZIP *</label>
                                     <input name="pincode" type="text" class="form-control">
                                     <small  class="error-message" id="pincode-error"></small>
-                                </div><!-- End .col-sm-6 -->
+                                </div>End .col-sm-6 -->
 
 
-                            </div><!-- End .row -->
+<!-- </div>End .row -->
 
-                            
-                        <div>
+
+<!-- <div>
                             <button  type="submit" class="btn btn-success">
                                 Update
-                        </div>
+                        </div> -->
 
-                        </div>
+<!-- </div>
 
                     </div>
                 </form>
             </div>
         </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<script>
+<!-- </div><!-- /.modal-dialog -->
+<!-- </div>/.modal -->
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Get the modal element
         const editAddressModal = document.getElementById('ModalEditAddress');
@@ -177,7 +298,7 @@
             });
         });
     });
-</script>
+</script> -->
 <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -653,7 +774,7 @@
             console.log(formObject)
 
             const url = '/add-address'
-            fetch(url,{
+            fetch(url, {
                 method: 'POST',
                 body: JSON.stringify(formObject),
                 headers: {
@@ -731,38 +852,36 @@
 
 
 
-    function editAddress(addressId) {
-    // Assuming you have a form for editing the address with id="editAddressForm"
-    const form = document.getElementById('editAddressForm');
+//     function editAddress(addressId) {
+//     // Assuming you have a form for editing the address with id="editAddressForm"
+//     const form = document.getElementById('editAddressForm');
 
-    // Assuming you have a modal for displaying the edit form with id="editAddressModal"
-    const modal = document.getElementById('editAddressModal');
+//     // Assuming you have a modal for displaying the edit form with id="editAddressModal"
+//     const modal = document.getElementById('editAddressModal');
 
-    // Fetch the address data based on the addressId
-    fetch(`/get-address/${addressId}`)
-        .then(response => response.json())
-        .then(addressData => {
-            // Populate the form fields with the retrieved address data
-            const fnameError = document.querySelector('#fnameError');
-        const lnameError = document.querySelector('#lnameError');
-        const countryError = document.querySelector('#countryError');
-        const billingAddressError = document.querySelector('#billingAddressError');
-        const cityError = document.querySelector('#cityError');
-        const stateError = document.querySelector('#stateError');
-        const postError = document.querySelector('#postError');
-        const phoneError = document.querySelector('#phoneError');
-        const emailError = document.querySelector('#emailError');
+//     // Fetch the address data based on the addressId
+//     fetch(`/get-address/${addressId}`)
+//         .then(response => response.json())
+//         .then(addressData => {
+//             // Populate the form fields with the retrieved address data
+//             const fnameError = document.querySelector('#fnameError');
+//         const lnameError = document.querySelector('#lnameError');
+//         const countryError = document.querySelector('#countryError');
+//         const billingAddressError = document.querySelector('#billingAddressError');
+//         const cityError = document.querySelector('#cityError');
+//         const stateError = document.querySelector('#stateError');
+//         const postError = document.querySelector('#postError');
+//         const phoneError = document.querySelector('#phoneError');
+//         const emailError = document.querySelector('#emailError');
 
-            // Display the modal
-            $(modal).modal('show');
-        })
-        .catch(error => {
-            console.error('Error fetching address data:', error);
-            // Handle error, e.g., display an error message to the user
-        });
-}
-
-
+//             // Display the modal
+//             $(modal).modal('show');
+//         })
+//         .catch(error => {
+//             console.error('Error fetching address data:', error);
+//             // Handle error, e.g., display an error message to the user
+//         });
+// }
 
 
 
@@ -770,5 +889,6 @@
 
 
 
-</script>
 
+
+</scrip >

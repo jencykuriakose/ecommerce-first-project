@@ -104,6 +104,8 @@ userRouter.route("/wishlist/:productId").delete(IsLoggedIn, cartController.Remov
 userRouter.route("/search-result").get(productController.ProductBySearch);
 
 userRouter.route("/");
+userRouter.route("/update-address/:addressId").post(userController.updateAddress);
+
 
 //  coupon
 

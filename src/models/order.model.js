@@ -4,13 +4,13 @@ const cartDatabase = require("../schema/cart.schema");
 const productDatabase = require("../schema/product.schema");
 const userDatabase = require("../schema/user.schema");
 const { addressSchema } = require("../config/joi");
-const productModel=require("../models/product.model");
+const productModel = require("../models/product.model");
 const crypto = require("crypto");
 const moment = require("moment");
 const transactionHistory = require("../schema/transaction.history");
 const { log } = require("console");
 
-const productmodel=new productModel();
+const productmodel = new productModel();
 
 class orderModel {
 	constructor() {}
@@ -46,7 +46,7 @@ class orderModel {
 	}
 
 	async AddOrderDetails(addressId, paymentMethod, userId, req, res) {
-		if (!["razorpay", "cashOnDelivery"],["wallet"].includes(paymentMethod)) {
+		if ((!["razorpay", "cashOnDelivery"], ["wallet"].includes(paymentMethod))) {
 			console.log("payment method:", paymentMethod);
 			throw new Error("Invalid payment method");
 		}
@@ -73,15 +73,15 @@ class orderModel {
 			});
 
 			if (req.session.coupon) {
-			  let coupon = req.session.coupon;
-			  const discountAmount = (coupon.discount / 100) * cartResult.total;
-			  order.discount = discountAmount;
-			  order.total = cartResult.total - discountAmount.toFixed(2);
+				let coupon = req.session.coupon;
+				const discountAmount = (coupon.discount / 100) * cartResult.total;
+				order.discount = discountAmount;
+				order.total = cartResult.total - discountAmount.toFixed(2);
 			}
 
 			if (req.session.appliedWallet) {
-			  let appliedWallet = req.session.appliedWallet;
-			  order.total = order.total - appliedWallet;
+				let appliedWallet = req.session.appliedWallet;
+				order.total = order.total - appliedWallet;
 			}
 
 			for (const item of cartResult.items) {
@@ -186,7 +186,7 @@ class orderModel {
 		orderData.subtotal = subtotal;
 
 		if (orderData) {
-			console.log(orderData,"😊🤪");
+			console.log(orderData, "😊🤪");
 			return { status: true, orderData };
 		} else {
 			return { status: false };
@@ -202,8 +202,8 @@ class orderModel {
 		}
 	}
 
-	async editAddress(addressId){
-		const result=await addressDatabase.findByIdAndUpdate(addressId);
+	async editAddress(addressId) {
+		const result = await addressDatabase.findByIdAndUpdate(addressId);
 		if (result) {
 			return true;
 		} else {
@@ -365,9 +365,8 @@ class orderModel {
 	}
 
 	async changeOrderStatus(changeStatus, orderId) {
-
 		console.log("enteredd//////////////////");
-	
+
 		if (!["shipped", "delivered", "canceled", "returned"].includes(changeStatus)) {
 			throw new Error("Invalid status");
 		}
@@ -377,52 +376,39 @@ class orderModel {
 			}
 		});
 		const userId = orderResult.user;
-		if (changeStatus === 'returned' || changeStatus === 'canceled' && orderResult.paymentmethod !== 'cashOnDelivery') {
-			const orderResult = await orderDatabase.findById(orderId).select('total user');
+		if (changeStatus === "returned" || (changeStatus === "canceled" && orderResult.paymentmethod !== "cashOnDelivery")) {
+			const orderResult = await orderDatabase.findById(orderId).select("total user");
 			const { total, user } = orderResult;
 			console.log(orderResult);
-			const userResult = await userDatabase.findById(user).select('wallet');
+			const userResult = await userDatabase.findById(user).select("wallet");
 			console.log(userResult);
 			const wallet = userResult.wallet;
 			const updatedWallet = wallet + total;
 			await userDatabase.findByIdAndUpdate(user, {
-			  $set: {
-				wallet: updatedWallet,
-			  },
+				$set: {
+					wallet: updatedWallet
+				}
 			});
 
-			
-			const debitedTransaction = {
-				user: userId,
+			const data = {
+				user:orderResult.user,
 				amount: total,
 				type: "Credited",
 				orderId: orderId,
-				// paymentMethod: orderResult.paymentmethod,
 				date: Date.now()
 			};
-			
-			// Use insertOne for inserting a single document
-			await transactionHistory.create(debitedTransaction);
-			console.log("Transaction history added:", debitedTransaction);
-		  }
-		  
-		
-		  if(changeStatus === 'returned' || changeStatus  === 'canceled'){
-			await productmodel.updateProductStocks(orderId, changeStatus); 
-		  }
+			await transactionHistory.insertMany([data]);
+		}
+
+		// if (changeStatus === "returned" || changeStatus === "canceled") {
+		// 	await productmodel.updateProductStocks(orderId, changeStatus);
+		// }
 		if (orderResult) {
 			return { status: true, message: "order updated" };
 		} else {
 			return { status: false, message: "something goes wrong updation failed" };
 		}
 	}
-
-
-
-
-
-
-
 
 	async returnOrder(orderId, returnReason) {
 		try {
@@ -440,8 +426,6 @@ class orderModel {
 			console.log(error);
 		}
 	}
-
-
 
 	async getwallet(userId) {
 		try {
@@ -470,11 +454,6 @@ class orderModel {
 		}
 	}
 
-
-	
-	  
-
-
 	async getUserData(userId) {
 		try {
 			const amount = await userDatabase.findById(userId).select("wallet");
@@ -488,83 +467,65 @@ class orderModel {
 		}
 	}
 
-	async changePaymentStatus(orderId,paymentDetails,res){
+	async changePaymentStatus(orderId, paymentDetails, res) {
 		try {
-			const changePaymentStatus=await orderDatabase.updateOne({_id:orderId},
+			const changePaymentStatus = await orderDatabase.updateOne(
+				{ _id: orderId },
 				{
-				$set:{
-					status:'processing',
-					paymentResponse:paymentDetails
+					$set: {
+						status: "processing",
+						paymentResponse: paymentDetails
+					}
 				}
-			})
-			return (changePaymentStatus.modifiedCount>0)? true: false;
-				
+			);
+			return changePaymentStatus.modifiedCount > 0 ? true : false;
 		} catch (error) {
-			throw new Error("Error in changing payment status")
+			throw new Error("Error in changing payment status");
 		}
 	}
 
-	
+	// async getAllCoupons(){
+	// 	try {
+	// 		const currentDate = new Date();
+	// 		const result = await couponDatabase.find({ validUntil: { $gte: currentDate } }).sort({ validFrom: 1 });
+	// 		return result;
+	// 	  } catch (error) {
+	// 		throw new Error('oops!something wrong while fetching coupons');
+	// 	  }
+	// }
 
-// async getAllCoupons(){
-// 	try {
-// 		const currentDate = new Date();
-// 		const result = await couponDatabase.find({ validUntil: { $gte: currentDate } }).sort({ validFrom: 1 });
-// 		return result;
-// 	  } catch (error) {
-// 		throw new Error('oops!something wrong while fetching coupons');
-// 	  }
-// }
-
-
-async updatedWalletData(walletAmount,userId,orderId){
-	try{
-const user=await userDatabase.findByIdAndUpdate(
-	userId,
-	{
-		$inc:{wallet:-walletAmount},
-	},
-	{new:true},
-);
-const result=await orderDatabase.findByIdAndUpdate(
-	orderId,
-	{
-		$set:{wallet:walletAmount},
-	},
-	{new:true},
-);
-return;
-
-	}catch(error){
-throw new Error("error update wallet data!");
+	async updatedWalletData(walletAmount, userId, orderId) {
+		try {
+			const user = await userDatabase.findByIdAndUpdate(
+				userId,
+				{
+					$inc: { wallet: -walletAmount }
+				},
+				{ new: true }
+			);
+			const result = await orderDatabase.findByIdAndUpdate(
+				orderId,
+				{
+					$set: { wallet: walletAmount }
+				},
+				{ new: true }
+			);
+			return;
+		} catch (error) {
+			throw new Error("error update wallet data!");
+		}
 	}
-}
 
-
-
-async addCouponData(couponData,userId){
-	try{
-const user= await userDatabase.findById(userId)
-user.couponHistory.push(couponData._id);
-await user.save();
-return true;
-	}catch(error){
-throw new Error("oops!something wrong while adding coupon data")
+	async addCouponData(couponData, userId) {
+		try {
+			const user = await userDatabase.findById(userId);
+			user.couponHistory.push(couponData._id);
+			await user.save();
+			return true;
+		} catch (error) {
+			throw new Error("oops!something wrong while adding coupon data");
+		}
 	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 module.exports = orderModel;
